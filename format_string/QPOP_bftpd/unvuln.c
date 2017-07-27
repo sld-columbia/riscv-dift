@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 
 int main(int argc, char* argv[])
 {
@@ -7,7 +6,7 @@ int main(int argc, char* argv[])
   char buffer[512];
 
   sprintf(buffer, "ERR Wrong Command: %400s", argv[1]);
-  strncpy(outbuf, buffer, sizeof(outbuf));
+  snprintf(outbuf, sizeof(outbuf), buffer);
 
   return 0;
 }

@@ -1,0 +1,1 @@
+./vuln "Bob %x %x"
