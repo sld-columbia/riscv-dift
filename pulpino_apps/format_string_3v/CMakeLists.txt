@@ -1,0 +1,1 @@
+add_application(format_string_3v format_string.c)

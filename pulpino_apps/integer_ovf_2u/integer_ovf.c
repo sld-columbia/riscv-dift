@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
-void bad_function(char *input)
+void good_function(char *input)
 {
   char dest_buffer[32];
-  char input_len = strlen(input);
+  int input_len = strlen(input);
 
-  /* A char is an 8-bit signed integer */
   if (input_len < 32)
   {
-    strcpy(dest_buffer, input);
+    strncpy(dest_buffer, input, 32);
     printf("The first command line argument is %s\n", dest_buffer);
   }
   else
@@ -20,14 +19,7 @@ void bad_function(char *input)
 
 int main(int argc, char *argv[])
 {
-  if (argc > 1)
-  {
-    bad_function(argv[1]);  
-  }
-  else
-  {
-    printf("No command line argument was given.\n");
-  }
+  good_function("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");  
 
   return 0;
 }

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 void secretFunction()
 {
@@ -10,14 +11,18 @@ void echo()
 {
     char buffer[20];
 
-    printf("Enter some text:\n");
-    scanf("%s", buffer);
+    strcpy(buffer, "");
     printf("You entered: %s\n", buffer);    
 }
 
 int main()
 {
-    echo();
+    volatile int a = 1;
+    
+    if(a)
+      echo();
+    else
+      secretFunction();
 
     return 0;
 }

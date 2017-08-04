@@ -1,12 +1,12 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 
 void bad_function(char *input)
 {
   char dest_buffer[32];
-  char input_len = strlen(input);
+  signed char input_len = strlen(input);
 
-  /* A char is an 8-bit signed integer */
   if (input_len < 32)
   {
     strcpy(dest_buffer, input);
@@ -20,15 +20,8 @@ void bad_function(char *input)
 
 int main(int argc, char *argv[])
 {
-  if (argc > 1)
-  {
-    bad_function(argv[1]);  
-  }
-  else
-  {
-    printf("No command line argument was given.\n");
-  }
-
+  bad_function("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");  
+  
   return 0;
 }
 

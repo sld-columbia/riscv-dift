@@ -46,8 +46,16 @@ char* shmop_read(int start, int count)
 
   bytes = count ? count : SIZE - start;
 
+  printf("%d\n", bytes);
+
+  /* 
+  *  The call to emalloc() will add one to the already huge value resulting
+  *  in allocation of roughly 4GB of memory. The next call to memcpy() will 
+  *  end up reading shared memory that is definitely out of the range of the requested object.
+  */
+  
   return_string = (char*)malloc(bytes+1);
-  memcpy(return_string, startaddr, bytes);
+  //memcpy(return_string, startaddr, bytes);
   return_string[bytes] = 0;
 
   return return_string;
