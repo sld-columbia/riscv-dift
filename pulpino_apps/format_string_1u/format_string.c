@@ -9,7 +9,7 @@ int main (int argc, char **argv)
   //snprintf(buf, sizeof(buf), argv[1]) ;
   strncpy(buf, argv[1], sizeof(buf));
   buf[sizeof(buf)-1] = 0;
-  printf("Buffer size is: (%d)\nData input: %s\n", strlen(buf), buf) ;
+  printf("Buffer size is: (%d)\nData input: %s\n", strlen(buf), buf);
 	
   return 0;
 }

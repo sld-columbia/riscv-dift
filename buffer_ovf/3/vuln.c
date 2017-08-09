@@ -2,32 +2,13 @@
 #include <string.h>
 
 /*****************************************************************/
-/*            Location: BSS     Target: global variable          */
+/*         Location: stack     Target: return address            */
 /*****************************************************************/
 
-static char buff[15];
-static int pass = 0;
-
-int main(void)
+int main (int argc, char** argv)
 {
-    printf("Enter the password : \n");
-    gets(buff);
-
-    if(strcmp(buff, "thegeekstuff"))
-    {
-        printf ("Wrong Password \n");
-    }
-    else
-    {
-        printf ("Correct Password \n");
-        pass = 1;
-    }
-
-    if(pass)
-    {
-       /* Now Give root or admin rights to user*/
-        printf ("Root privileges given to the user \n");
-    }
+    char buffer[500];
+    strcpy(buffer, argv[1]);
 
     return 0;
 }

