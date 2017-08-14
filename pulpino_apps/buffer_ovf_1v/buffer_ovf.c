@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(void)
+char* dummy_args[] = {"buffer_ovf_1v", "hhhhhhhhhhhhhhhhhhhh", NULL};
+
+int main(int argc, char* argv[])
 {
     char buff[15];
     int pass = 0;
+    argv = dummy_args;    
+    argc = sizeof(dummy_args)/sizeof(dummy_args[0])-1; 
 
-    strcpy(buff,"hhhhhhhhhhhhhhhhhhhh");
-    
+    strcpy(buff, argv[1]);
+
     if(strcmp(buff, "thegeekstuff"))
     {
         printf ("Wrong Password \n");

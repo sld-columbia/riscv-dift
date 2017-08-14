@@ -1,19 +1,21 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define SIZE 15
-    
-static char buff[SIZE];
-static int pass = 0;
-
-int main(void)
+int main(int argc, char* argv[])
 {
-    printf("Enter the password : \n");
-    fgets(buff, SIZE, stdin);
+    char buff[15];
+    int pass = 0;
 
-    buff[strlen(buff)-1] = '\0';
+    if (argc =! 2)
+    {
+      fprintf(stderr, "Right usage: ./vuln password");
+      exit(1);
+    }
 
-    if(strncmp(buff, "thegeekstuff", SIZE))
+    strncpy(buff, argv[1], sizeof(buff)-1);
+
+    if(strcmp(buff, "thegeekstuff"))
     {
         printf ("Wrong Password \n");
     }

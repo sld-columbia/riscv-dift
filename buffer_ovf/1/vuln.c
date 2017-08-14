@@ -1,17 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-/*****************************************************************/
-/*            Location: BSS     Target: global variable          */
-/*****************************************************************/
-
-static char buff[15];
-static int pass = 0;
-
-int main(void)
+int main(int argc, char* argv[])
 {
-    printf("Enter the password : \n");
-    gets(buff);
+    char buff[15];
+    int pass = 0;
+
+    if (argc =! 2)
+    {
+      fprintf(stderr, "Right usage: ./vuln password");
+      exit(1);
+    }
+
+    strcpy(buff, argv[1]);
 
     if(strcmp(buff, "thegeekstuff"))
     {

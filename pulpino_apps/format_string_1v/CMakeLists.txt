@@ -1,1 +1,0 @@
-add_application(format_string_1v format_string.c)
