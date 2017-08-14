@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/*****************************************************************/
-/*         Location: stack     Target: return address            */
-/*****************************************************************/
-
 int main (int argc, char** argv)
 {
     char buffer[500];

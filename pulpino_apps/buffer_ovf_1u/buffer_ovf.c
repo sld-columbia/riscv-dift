@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-char* dummy_args[] = {"buffer_ovf_1v", "hhhhhhhhhhhhhhhhhhhh", NULL};
+char* dummy_args[] = {"buffer_ovf_1u", "hhhhhhhhhhhhhhhhhhhh", NULL};
 
 int main(int argc, char* argv[])
 {

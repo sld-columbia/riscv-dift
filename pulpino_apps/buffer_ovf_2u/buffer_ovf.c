@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-char* dummy_args[] = {"buffer_ovf_2v", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\xf0\x03\x00\x00", NULL};
+char* dummy_args[] = {"buffer_ovf_2u", "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\xf0\x03\x00\x00", NULL};
 
 void secretFunction()
 {
