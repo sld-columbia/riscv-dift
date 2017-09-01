@@ -69,7 +69,7 @@ module riscv_if_stage
 
     // jump and branch target and decision
     input  logic [31:0] jump_target_id_i,      // jump target address
-    input  logic [31:0] jump_target_ex_i,      // jump target address
+    input  logic [31:0] jump_target_ex_i,      // branch target address
 
     // from hwloop controller
     input  logic [N_HWLP-1:0] [31:0] hwlp_start_i,          // hardware loop start addresses

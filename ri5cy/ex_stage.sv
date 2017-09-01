@@ -96,9 +96,12 @@ module riscv_ex_stage
 `ifdef DIFT
   ,
   input  logic [ALU_MODE_WIDTH-1:0] alu_operator_i_mode,
-  input  logic        alu_operand_a_ex_i_tag,
-  input  logic        alu_operand_b_ex_i_tag,
-  input  logic        alu_operand_c_ex_i_tag
+  input  logic        alu_operand_a_i_tag,
+  input  logic        alu_operand_b_i_tag,
+  input  logic        alu_operand_c_i_tag,
+  output logic        regfile_alu_wdata_fw_o_tag,
+  output logic        regfile_alu_we_fw_o_tag,
+  output logic        jump_target_o_tag
 `endif
 );
 
@@ -125,6 +128,12 @@ module riscv_ex_stage
   // branch handling
   assign branch_decision_o = alu_cmp_result;
   assign jump_target_o     = alu_operand_c_i;
+
+`ifdef DIFT
+  assign regfile_alu_wdata_fw_o_tag = alu_result_tag;
+  assign regfile_alu_we_fw_o_tag    = rf_enable_o_tag;
+  assign jump_target_o_tag          = alu_operand_c_i_tag;
+`endif
 
 
   ////////////////////////////
@@ -158,6 +167,27 @@ module riscv_ex_stage
     .ex_ready_i          ( ex_ready_o      )
   );
 
+  ///////////////////////////////////////////////////
+  //  _____  _    ____ ____       _    _    _   _  //
+  // |_   _|/ \  / ___/ ___|     / \  | |  | | | | //
+  //   | | / _ \| |  _\___ \    / _ \ | |  | | | | //
+  //   | |/ ___ \ |_| |___) |  / ___ \| |__| |_| | //
+  //   |_/_/   \_\____|____/  /_/   \_\_____\___/  //
+  //                                               //
+  ///////////////////////////////////////////////////
+`ifdef DIFT
+  riscv_alu_tag alu_tag_i
+  (
+    .clk                  ( clk                     ),
+    .rst_n,               ( rst_n                   ),
+    .operator_i,          ( alu_operator_i_mode     ),
+    .operand_a_i,         ( alu_operand_a_i_tag     ),
+    .operand_b_i,         ( alu_operand_b_i_tag     ),
+    .operand_c_i,         ( alu_operand_c_i_tag     ),
+    .result_o,            ( alu_result_tag          ),
+    .rf_enable_tag        ( rf_enable_o_tag         )
+  );
+`endif
 
   ////////////////////////////////////////////////////////////////
   //  __  __ _   _ _   _____ ___ ____  _     ___ _____ ____     //

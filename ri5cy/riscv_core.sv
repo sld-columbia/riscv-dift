@@ -177,11 +177,6 @@ module riscv_core
   logic [31:0] csr_rdata;
   logic [31:0] csr_wdata;
 
-  `ifdef DIFT
-    logic [31:0] tpr;
-    logic [31:0] tcr;
-  `endif
-
   // Data Memory Control:  From ID stage (id-ex pipe) <--> load store unit
   logic        data_we_ex;
   logic [1:0]  data_type_ex;
@@ -472,10 +467,6 @@ module riscv_core
     // CSR ID/EX
     .csr_access_ex_o              ( csr_access_ex        ),
     .csr_op_ex_o                  ( csr_op_ex            ),
-    `ifdef DIFT
-      .tpr_i                      ( tpr                  ),
-      .tcr_i                      ( tcr                  ),
-    `endif
 
     // hardware loop signals to IF hwlp controller
     .hwlp_start_o                 ( hwlp_start           ),
@@ -711,11 +702,6 @@ module riscv_core
     // Interrupt related control signals
     .irq_enable_o            ( irq_enable         ),
     .mepc_o                  ( mepc               ),
-
-    `ifdef DIFT
-      .tpr_o                 ( tpr                ),
-      .tcr_o                 ( tcr                ),
-    `endif
 
     .pc_if_i                 ( pc_if              ),
     .pc_id_i                 ( pc_id              ), // from IF stage

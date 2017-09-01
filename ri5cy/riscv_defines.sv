@@ -190,19 +190,19 @@ parameter BRANCH_LOW       = 2;
 parameter BRANCH_HIGH      = 3;
 // Jump class: JAL, JALR
 parameter JUMP_LOW         = 4;
-parameter JUMP_HIGH        = 7;
+parameter JUMP_HIGH        = 5;
 // Shift class: SLLI, SRLI, SRAI, SLL, SRL, SRA
-parameter SHIFT_LOW        = 8;
-parameter SHIFT_HIGH       = 9;
+parameter SHIFT_LOW        = 6;
+parameter SHIFT_HIGH       = 7;
 // Comparison class: SLTI[U], SLT[U]
-parameter COMPARISON_LOW   = 10;
-parameter COMPARISON_HIGH  = 11;
+parameter COMPARISON_LOW   = 8;
+parameter COMPARISON_HIGH  = 9;
 // Logical class: ANDI, ORI, XORI, AND, OR, XOR
-parameter LOGICAL_LOW      = 12;
-parameter LOGICAL_HIGH     = 13;
+parameter LOGICAL_LOW      = 10;
+parameter LOGICAL_HIGH     = 11;
 // Load/Store class: LW, LH[U], LB[U], SW, SH, SB, LUI, AUIPC
-parameter LOADSTORE_LOW    = 14;
-parameter LOADSTORE_HIGH   = 15;
+parameter LOADSTORE_LOW    = 12;
+parameter LOADSTORE_HIGH   = 13;
 
 /////////////////////////////////////////////////////////
 //    ____ ____    ____            _     _             //

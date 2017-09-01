@@ -201,17 +201,18 @@ module riscv_id_stage
 // DIFT signals
 `ifdef DIFT
     ,
-    input  logic [1:0]  regfile_wdata_wb_i_tag, // From WB stage
-    input  logic [1:0]  regfile_alu_wdata_fw_i_tag, // From ALU (EX stage)
-    input  logic [31:0] tpr_i,
-    input  logic [31:0] tcr_i,
-    input  logic        pc_id_i_tag,
-    output logic        jump_target_o_tag,
+    input  logic [31:0] regfile_wdata_wb_i_tag,            // From WB stage
+    input  logic [31:0] regfile_alu_wdata_fw_i_tag,        // From tags ALU (EX stage)
+    input  logic        regfile_we_wdata_fw_i_tag,         // From tags ALU (EX stage)
+    input  logic [31:0] tpr_i,       
+    input  logic [31:0] tcr_i,       
+    input  logic        pc_id_i_tag,                       // From IF
+    output logic        jump_target_o_tag,                 // To IF
     output logic        pc_ex_o_tag,
-    output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode,
-    output logic        alu_operand_a_ex_o_tag,
-    output logic        alu_operand_b_ex_o_tag,
-    output logic        alu_operand_c_ex_o_tag
+    output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode, // To EX
+    output logic        alu_operand_a_ex_o_tag,            // To EX
+    output logic        alu_operand_b_ex_o_tag,            // To EX
+    output logic        alu_operand_c_ex_o_tag             // To EX
 `endif
 );
 
@@ -384,7 +385,6 @@ module riscv_id_stage
   logic        operand_b_tag;
   logic        jump_target_tag;
   logic        alu_operator_mode;
-  logic        jump_pc_alu_operator_mode;
 `endif
 
   assign instr = instr_rdata_i;
@@ -531,34 +531,20 @@ module riscv_id_stage
     endcase
   end
 
-  assign jump_target_o = jump_target;
+  assign jump_target_o = jump_target; // To ID
 
 `ifdef DIFT
   always_comb
   begin : jump_target_mux_tag
     unique case (jump_target_mux_sel)
-      JT_JAL: begin
-        unique case (jump_pc_alu_operator_mode)
-          ALU_MODE_OLD:   jump_target_tag = pc_id_i_tag;
-          ALU_MODE_AND:   jump_target_tag = pc_id_i_tag & operand_b_tag;
-          ALU_MODE_OR:    jump_target_tag = pc_id_i_tag | operand_b_tag;
-          ALU_MODE_CLEAR: jump_target_tag = '0;
-          default:        jump_target_tag = pc_id_i_tag;
-      end
+      JT_JAL:  jump_target_tag = pc_id_i_tag;
       JT_COND: jump_target_tag = pc_id_i_tag;
-      JT_JALR: begin
-        unique case (jump_pc_alu_operator_mode)
-          ALU_MODE_OLD:   jump_target_tag = pc_id_i_tag;
-          ALU_MODE_AND:   jump_target_tag = regfile_data_ra_id_tag & operand_b_tag;
-          ALU_MODE_OR:    jump_target_tag = regfile_data_ra_id_tag | operand_b_tag;
-          ALU_MODE_CLEAR: jump_target_tag = '0;
-          default:        jump_target_tag = pc_id_i_tag;
-      end
-      default:  jump_target_tag = regfile_data_ra_id_tag;
+      JT_JALR: jump_target_tag = regfile_data_ra_id_tag;
+      default: jump_target_tag = regfile_data_ra_id_tag;
     endcase
   end
 
-  assign jump_target_o_tag = jump_target_tag;
+  assign jump_target_o_tag = jump_target_tag; // To ID
 `endif
 
 
@@ -750,7 +736,7 @@ module riscv_id_stage
     case (alu_op_c_mux_sel)
       OP_C_REGC_OR_FWD:  alu_operand_c = operand_c_fw_id;
       OP_C_REGB_OR_FWD:  alu_operand_c = operand_b_fw_id;
-      OP_C_JT:           alu_operand_c = jump_target;
+      OP_C_JT:           alu_operand_c = jump_target; // To EX
       default:            alu_operand_c = operand_c_fw_id;
     endcase // case (alu_op_c_mux_sel)
   end
@@ -773,7 +759,7 @@ module riscv_id_stage
       case (alu_op_c_mux_sel)
         OP_C_REGC_OR_FWD:  alu_operand_c_tag = operand_c_fw_id_tag;
         OP_C_REGB_OR_FWD:  alu_operand_c_tag = operand_b_fw_id_tag;
-        OP_C_JT:           alu_operand_c_tag = jump_target_tag;
+        OP_C_JT:           alu_operand_c_tag = jump_target_tag; // To EX
         default:            alu_operand_c_tag = operand_c_fw_id_tag;
       endcase // case (alu_op_c_mux_sel)
     end
@@ -1010,8 +996,7 @@ module riscv_id_stage
     .tpr_i                           ( tpr_i                     ),
 
     // jump/branches
-    .alu_operator_o_mode             ( alu_operator_mode            ),
-    .jump_pc_alu_operator_o_mode     ( jump_pc_alu_operator_mode    )
+    .alu_operator_o_mode             ( alu_operator_mode            )
   );
 `endif
 
@@ -1417,10 +1402,10 @@ module riscv_id_stage
     end
   end
 `endif
+
   // stall control
   assign id_ready_o = ((~misaligned_stall) & (~jr_stall) & (~load_stall) & ex_ready_i);
   assign id_valid_o = (~halt_id) & id_ready_o;
-
 
   //----------------------------------------------------------------------------
   // Assertions

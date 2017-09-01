@@ -23,14 +23,12 @@ module riscv_decoder_tag
   input  logic [31:0] tpr_i,
 
   // ALU signals
-  output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode, // ALU tags operation selection
-  output logic [ALU_MODE_WIDTH-1:0] jump_pc_alu_operator_o_mode // ALU tags operation selection
+  output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode // ALU tags operation selection
 );
 
   always_comb
   begin
     alu_operator_o_mode          = ALU_MODE_OLD;
-    jump_pc_alu_operator_o_mode  = ALU_MODE_OLD;
 
     unique case (instr_rdata_i[6:0])
 
@@ -46,7 +44,6 @@ module riscv_decoder_tag
       OPCODE_JAL,
       OPCODE_JALR: begin   // Jump and Link
         alu_operator_o_mode  = tpr_i[JUMP_HIGH:JUMP_HIGH-1];
-        jump_pc_alu_operator_o_mode = tpr_i[JUMP_HIGH-2:JUMP_LOW];
       end
 
      //////////////////////////////////////////////
@@ -248,7 +245,6 @@ module riscv_decoder_tag
       end
       default: begin
         alu_operator_o_mode         = ALU_MODE_OLD;
-        jump_pc_alu_operator_o_mode = ALU_MODE_OLD;
       end
     endcase
   end
