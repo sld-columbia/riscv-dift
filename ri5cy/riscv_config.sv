@@ -29,4 +29,4 @@
 //`define SIMCHECKER
 `endif
 
-//`define DIFT 1
+`define DIFT 1

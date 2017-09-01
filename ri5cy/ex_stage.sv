@@ -105,7 +105,6 @@ module riscv_ex_stage
 `endif
 );
 
-
   logic [31:0] alu_result;
   logic [31:0] alu_csr_result;
   logic [31:0] mult_result;
@@ -114,6 +113,10 @@ module riscv_ex_stage
   logic        alu_ready;
   logic        mult_ready;
 
+`ifdef DIFT
+  logic [31:0] alu_result_tag;
+  logic        rf_enable_o_tag;
+`endif
 
   // EX stage result mux (ALU, MAC unit, CSR)
   assign alu_csr_result         = csr_access_i ? csr_rdata_i : alu_result;
