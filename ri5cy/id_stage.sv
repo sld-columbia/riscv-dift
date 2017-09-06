@@ -201,14 +201,14 @@ module riscv_id_stage
 // DIFT signals
 `ifdef DIFT
     ,
-    input  logic [31:0] regfile_wdata_wb_i_tag,            // From WB stage
-    input  logic [31:0] regfile_alu_wdata_fw_i_tag,        // From tags ALU (EX stage)
+    input  logic        regfile_wdata_wb_i_tag,            // From WB stage
+    input  logic        regfile_alu_wdata_fw_i_tag,        // From tags ALU (EX stage)
     input  logic        regfile_alu_we_fw_i_tag,           // From tags ALU (EX stage)
     input  logic [31:0] tpr_i,                             // From CRS       
     input  logic [31:0] tcr_i,                             // From CRS
     input  logic        pc_id_i_tag,                       // From IF
     output logic        jump_target_o_tag,                 // To IF
-    output logic        pc_ex_o_tag,
+    output logic        pc_ex_o_tag,                       // To CSR (?)
     output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode, // To EX
     output logic        alu_operand_a_ex_o_tag,            // To EX
     output logic        alu_operand_b_ex_o_tag,            // To EX
@@ -384,7 +384,7 @@ module riscv_id_stage
   logic        operand_c_fw_id_tag;
   logic        operand_b_tag;
   logic        jump_target_tag;
-  logic        alu_operator_mode;
+  logic [ALU_MODE_WIDTH-1:0] alu_operator_mode;
   logic        is_store;
   logic        enable_a;
   logic        enable_b;
@@ -992,7 +992,6 @@ module riscv_id_stage
   riscv_mode_tag mode_i_tag
   (
     .instr_rdata_i                   ( instr                     ),
-    .pc_id_i_tag                     ( pc_id_i_tag               ),
     .tpr_i                           ( tpr_i                     ),
 
     // jump/branches

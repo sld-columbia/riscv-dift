@@ -17,7 +17,6 @@ module riscv_mode_tag
 (
   // from IF/ID pipeline
   input  logic [31:0] instr_rdata_i,           // instruction read from instr memory/cache
-  input  logic        pc_id_i_tag,
 
   // from CSRs
   input  logic [31:0] tpr_i,
@@ -56,11 +55,7 @@ module riscv_mode_tag
      //////////////////////////////////////////////
 
       OPCODE_BRANCH: begin // Branch
-        if (pc_id_i_tag) begin
-          alu_operator_o_mode = ALU_MODE_OLD;
-        end else begin
-          alu_operator_o_mode  = tpr_i[BRANCH_HIGH:BRANCH_LOW];
-        end
+        alu_operator_o_mode  = tpr_i[BRANCH_HIGH:BRANCH_LOW];
       end
 
       //////////////////////////////////

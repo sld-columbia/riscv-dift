@@ -101,7 +101,8 @@ module riscv_ex_stage
   input  logic        alu_operand_c_i_tag,
   output logic        regfile_alu_wdata_fw_o_tag,
   output logic        regfile_alu_we_fw_o_tag,
-  output logic        jump_target_o_tag
+  output logic        jump_target_o_tag,
+  output logic        pc_enable_o_tag
 `endif
 );
 
@@ -114,8 +115,9 @@ module riscv_ex_stage
   logic        mult_ready;
 
 `ifdef DIFT
-  logic [31:0] alu_result_tag;
-  logic        rf_enable_o_tag;
+  logic        alu_result_tag;
+  logic        rf_enable_tag;
+  logic        pc_enable_tag;
 `endif
 
   // EX stage result mux (ALU, MAC unit, CSR)
@@ -123,10 +125,8 @@ module riscv_ex_stage
 
   assign regfile_alu_wdata_fw_o = mult_en_i ? mult_result : alu_csr_result;
 
-
   assign regfile_alu_we_fw_o    = regfile_alu_we_i;
   assign regfile_alu_waddr_fw_o = regfile_alu_waddr_i;
-
 
   // branch handling
   assign branch_decision_o = alu_cmp_result;
@@ -134,8 +134,17 @@ module riscv_ex_stage
 
 `ifdef DIFT
   assign regfile_alu_wdata_fw_o_tag = alu_result_tag;
-  assign regfile_alu_we_fw_o_tag    = rf_enable_o_tag;
-  assign jump_target_o_tag          = alu_operand_c_i_tag;
+  assign regfile_alu_we_fw_o_tag    = rf_enable_tag;
+  
+  // if (branch is not taken)
+  //   old PC tag is not updated; 
+  // else
+  //   if (old PC tag is equal to 1)
+  //     new PC tag is equal to 1; 
+  //   else
+  //     new PC tag is the result of the policy applied on the source operands;
+  assign jump_target_o_tag          = alu_operand_c_i_tag | alu_result_tag;
+  assign pc_enable_o_tag            = pc_enable_tag;
 `endif
 
 
@@ -187,7 +196,8 @@ module riscv_ex_stage
     .operand_a_i,         ( alu_operand_a_i_tag     ),
     .operand_b_i,         ( alu_operand_b_i_tag     ),
     .result_o,            ( alu_result_tag          ),
-    .rf_enable_tag        ( rf_enable_o_tag         )
+    .rf_enable_tag        ( rf_enable_tag           ),
+    .pc_enable_tag        ( pc_enable_tag           )
   );
 `endif
 
