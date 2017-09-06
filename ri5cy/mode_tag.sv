@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Engineer        Christian Palmiero - cp3025@columbia.edu                   //
 //                                                                            //
-// Design Name:    Decoder tag                                                //
+// Design Name:    Mode tag                                                   //
 // Project Name:   RI5CY                                                      //
 // Language:       SystemVerilog                                              //
 //                                                                            //
@@ -13,7 +13,7 @@
 
 import riscv_defines::*;
 
-module riscv_decoder_tag
+module riscv_mode_tag
 (
   // from IF/ID pipeline
   input  logic [31:0] instr_rdata_i,           // instruction read from instr memory/cache
@@ -23,7 +23,7 @@ module riscv_decoder_tag
   input  logic [31:0] tpr_i,
 
   // ALU signals
-  output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode // ALU tags operation selection
+  output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode // ALU tags operation
 );
 
   always_comb
@@ -43,7 +43,7 @@ module riscv_decoder_tag
 
       OPCODE_JAL,
       OPCODE_JALR: begin   // Jump and Link
-        alu_operator_o_mode  = tpr_i[JUMP_HIGH:JUMP_HIGH-1];
+        alu_operator_o_mode  = tpr_i[JUMP_HIGH:JUMP_LOW];
       end
 
      //////////////////////////////////////////////
@@ -249,4 +249,4 @@ module riscv_decoder_tag
     endcase
   end
 
-endmodule // controller
+endmodule

@@ -5,9 +5,10 @@
 // Project Name:   RI5CY                                                      //
 // Language:       SystemVerilog                                              //
 //                                                                            //
-// Description:    Tag ALU                                                    //
-//                 This unit computes the destination tag based on the        //
-//                 source tags and on the type of the operation               //
+// Description:    Tags ALU                                                   //
+//                 This unit computes the destination operant tag based on    // 
+//                 the source operands tags and on the type of the operation  //
+//                 specified in the Tag Propagation Register                  //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -21,7 +22,6 @@ module riscv_alu_tag
   input  logic [ALU_MODE_WIDTH-1:0] operator_i,
   input  logic [31:0]               operand_a_i,
   input  logic [31:0]               operand_b_i,
-  input  logic [31:0]               operand_c_i,
 
   output logic [31:0]               result_o,
   output logic                      rf_enable_tag

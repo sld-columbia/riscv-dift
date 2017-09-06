@@ -186,7 +186,6 @@ module riscv_ex_stage
     .operator_i,          ( alu_operator_i_mode     ),
     .operand_a_i,         ( alu_operand_a_i_tag     ),
     .operand_b_i,         ( alu_operand_b_i_tag     ),
-    .operand_c_i,         ( alu_operand_c_i_tag     ),
     .result_o,            ( alu_result_tag          ),
     .rf_enable_tag        ( rf_enable_o_tag         )
   );

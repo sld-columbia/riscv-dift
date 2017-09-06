@@ -203,9 +203,9 @@ module riscv_id_stage
     ,
     input  logic [31:0] regfile_wdata_wb_i_tag,            // From WB stage
     input  logic [31:0] regfile_alu_wdata_fw_i_tag,        // From tags ALU (EX stage)
-    input  logic        regfile_we_wdata_fw_i_tag,         // From tags ALU (EX stage)
-    input  logic [31:0] tpr_i,       
-    input  logic [31:0] tcr_i,       
+    input  logic        regfile_alu_we_fw_i_tag,           // From tags ALU (EX stage)
+    input  logic [31:0] tpr_i,                             // From CRS       
+    input  logic [31:0] tcr_i,                             // From CRS
     input  logic        pc_id_i_tag,                       // From IF
     output logic        jump_target_o_tag,                 // To IF
     output logic        pc_ex_o_tag,
@@ -385,6 +385,9 @@ module riscv_id_stage
   logic        operand_b_tag;
   logic        jump_target_tag;
   logic        alu_operator_mode;
+  logic        is_store;
+  logic        enable_a;
+  logic        enable_b;
 `endif
 
   assign instr = instr_rdata_i;
@@ -492,7 +495,6 @@ module riscv_id_stage
     endcase
   end
 
-
   // hwloop cnt mux
   always_comb
   begin : hwloop_cnt_mux
@@ -508,7 +510,6 @@ module riscv_id_stage
   assign hwloop_cnt   = hwloop_we_int[2] ? hwloop_cnt_int   : csr_hwlp_data_i;
   assign hwloop_regid = (|hwloop_we_int) ? hwloop_regid_int : csr_hwlp_regid_i;
   assign hwloop_we    = (|hwloop_we_int) ? hwloop_we_int    : csr_hwlp_we_i;
-
 
   //////////////////////////////////////////////////////////////////
   //      _                         _____                    _    //
@@ -546,7 +547,6 @@ module riscv_id_stage
 
   assign jump_target_o_tag = jump_target_tag; // To ID
 `endif
-
 
   ////////////////////////////////////////////////////////
   //   ___                                 _      _     //
@@ -977,19 +977,10 @@ module riscv_id_stage
     .jump_in_dec_o                   ( jump_in_dec               ),
     .jump_in_id_o                    ( jump_in_id                ),
     .jump_target_mux_sel_o           ( jump_target_mux_sel       )
-
   );
 
-  ////////////////////////////////////////////////////////////////////////
-  //  _____  _    ____ ____    ____  _____ ____ ___  ____  _____ ____   //
-  // |_   _|/ \  / ___/ ___|  |  _ \| ____/ ___/ _ \|  _ \| ____|  _ \  //
-  //   | | / _ \| |  _\___ \  | | | |  _|| |  | | | | | | |  _| | |_) | //
-  //   | |/ ___ \ |_| |___) | | |_| | |__| |__| |_| | |_| | |___|  _ <  //
-  //   |_/_/   \_\____|____/  |____/|_____\____\___/|____/|_____|_| \_\ //
-  //                                                                    //
-  ////////////////////////////////////////////////////////////////////////
 `ifdef DIFT
-  riscv_decoder_tag decoder_i_tag
+  riscv_mode_tag mode_i_tag
   (
     .instr_rdata_i                   ( instr                     ),
     .pc_id_i_tag                     ( pc_id_i_tag               ),
@@ -997,6 +988,17 @@ module riscv_id_stage
 
     // jump/branches
     .alu_operator_o_mode             ( alu_operator_mode            )
+  );
+`endif
+
+`ifdef DIFT
+  riscv_enable_tag enable_i_tag
+  (
+    .instr_rdata_i                   ( instr                     ),
+    .tpr_i                           ( tpr_i                     ),
+    .is_store_o                      ( is_store                  ),
+    .enable_a_o                      ( enable_a                  ),
+    .enable_b_o                      ( enable_b                  )
   );
 `endif
 
@@ -1153,7 +1155,6 @@ module riscv_id_stage
 
     .dbg_settings_i       ( dbg_settings_i   )
   );
-
 
   //////////////////////////////////////////////////////////////////////////
   //          ____ ___  _   _ _____ ____   ___  _     _     _____ ____    //
@@ -1390,10 +1391,23 @@ module riscv_id_stage
       begin
         if (~mult_en)
         begin
-          alu_operator_o_mode         <= alu_operator_mode;
-          alu_operand_a_ex_o_tag      <= alu_operand_a_tag;
-          alu_operand_b_ex_o_tag      <= alu_operand_b_tag;
-          alu_operand_c_ex_o_tag      <= alu_operand_c_tag;
+          alu_operator_o_mode           <= alu_operator_mode;
+          if (is_store) begin
+            if (enable_a) begin
+              alu_operand_a_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address
+            end else begin 
+              alu_operand_a_ex_o_tag    <= '0;
+            end
+	    if (enable_b) begin
+	      alu_operand_b_ex_o_tag    <= alu_operand_c_tag;  // RS2: source
+            end else begin 
+              alu_operand_b_ex_o_tag    <= '0;
+            end
+          end else begin
+            alu_operand_a_ex_o_tag      <= alu_operand_a_tag;
+            alu_operand_b_ex_o_tag      <= alu_operand_b_tag;
+            alu_operand_c_ex_o_tag      <= alu_operand_c_tag;
+          end
         end
         if ((jump_in_id == BRANCH_COND) || data_load_event_id) begin
           pc_ex_o_tag               <= pc_id_i_tag;
