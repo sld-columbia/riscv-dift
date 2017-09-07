@@ -29,9 +29,9 @@ module riscv_enable_tag
 
   always_comb
   begin
-    enable_a_o = '0;
-    enable_b_o = '0;
-    is_store_o = '0;
+    enable_a_o = 1'b0;
+    enable_b_o = 1'b0;
+    is_store_o = 1'b0;
 
     unique case (instr_rdata_i[6:0])
 
@@ -40,7 +40,7 @@ module riscv_enable_tag
       : begin
         enable_a_o  = tpr_i[LOADSTORE_EN_DEST_ADDR];
         enable_b_o  = tpr_i[LOADSTORE_EN_SOURCE];
-        is_store_o = 1'b1;
+        is_store_o  = 1'b1;
       end
 
       OPCODE_LOAD

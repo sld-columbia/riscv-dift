@@ -23,7 +23,6 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-
 module riscv_load_store_unit
 (
     input  logic         clk,
@@ -81,6 +80,7 @@ module riscv_load_store_unit
 
 `ifdef DIFT
   logic         data_we_q_tag;
+  logic         rdata_q_tag;
 `endif
 
   logic [31:0]  data_addr_int;
@@ -97,7 +97,6 @@ module riscv_load_store_unit
   logic [31:0]  data_wdata;
 
   logic         misaligned_st;   // high if we are currently performing the second part of a misaligned store
-
 
   enum logic [1:0]  { IDLE, WAIT_RVALID, WAIT_RVALID_EX_STALL, IDLE_EX_STALL } CS, NS;
 
@@ -172,7 +171,6 @@ module riscv_load_store_unit
     endcase; // case (wdata_offset)
   end
 
-
   // FF for rdata alignment and sign-extension
   always_ff @(posedge clk, negedge rst_n)
   begin
@@ -205,7 +203,6 @@ module riscv_load_store_unit
     end
   end
 `endif
-
 
   ////////////////////////////////////////////////////////////////////////
   //  ____  _               _____      _                 _              //
@@ -318,8 +315,6 @@ module riscv_load_store_unit
     endcase //~case(rdata_type_q)
   end
 
-
-
   always_ff @(posedge clk, negedge rst_n)
   begin
     if(rst_n == 1'b0)
@@ -339,12 +334,42 @@ module riscv_load_store_unit
         // In all other cases, rdata_q gets the value that we are
         // writing to the register file
         if ((data_misaligned_ex_i == 1'b1) || (data_misaligned_o == 1'b1))
-          rdata_q  <= data_rdata_i;
+          rdata_q      <= data_rdata_i;
         else
-          rdata_q  <= data_rdata_ext;
+          rdata_q      <= data_rdata_ext;
       end
     end
   end
+
+`ifdef DIFT
+  always_ff @(posedge clk, negedge rst_n)
+  begin
+    if(rst_n == 1'b0)
+    begin
+      CS            <= IDLE;
+      rdata_q_tag   <= '0;
+    end
+    else
+    begin
+      CS            <= NS;
+      if (data_rvalid_i && (~data_we_q))
+      begin
+        // if we have detected a misaligned access, and we are
+        // currently doing the first part of this access, then
+        // store the data coming from memory in rdata_q.
+        // In all other cases, rdata_q gets the value that we are
+        // writing to the register file
+        if ((data_misaligned_ex_i == 1'b1) || (data_misaligned_o == 1'b1))
+          rdata_q_tag  <= |data_rdata_i_tag;
+        else
+          //rdata_q      <= data_rdata_ext;
+      end
+    end
+  end
+
+  //assign data_rdata_ex_o_tag = (data_rvalid_i == 1'b1) ? data_rdata_ext : rdata_q_tag;
+  assign data_rdata_ex_o_tag = rdata_q_tag;
+`endif
 
   // output to register file
   assign data_rdata_ex_o = (data_rvalid_i == 1'b1) ? data_rdata_ext : rdata_q;

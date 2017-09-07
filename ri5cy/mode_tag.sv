@@ -78,7 +78,7 @@ module riscv_mode_tag
       OPCODE_LOAD
       //OPCODE_LOAD_POST,
       : begin
-        alu_operator_o_mode = ALU_MODE_OLD;
+        alu_operator_o_mode  = ALU_MODE_OLD;
       end
 
       /////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -117,12 +117,12 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
           default: begin
-            alu_operator_o_mode         = ALU_MODE_OLD;
+            alu_operator_o_mode  = ALU_MODE_OLD;
           end
         endcase
       end
@@ -138,7 +138,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -151,7 +151,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -164,7 +164,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -177,7 +177,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -190,7 +190,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -203,7 +203,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -216,7 +216,7 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
@@ -229,17 +229,17 @@ module riscv_mode_tag
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
               default: begin
-                alu_operator_o_mode         = ALU_MODE_OLD;
+                alu_operator_o_mode  = ALU_MODE_OLD;
               end
             endcase
           end
           default: begin
-            alu_operator_o_mode         = ALU_MODE_OLD;
+            alu_operator_o_mode  = ALU_MODE_OLD;
           end
         endcase
       end
       default: begin
-        alu_operator_o_mode         = ALU_MODE_OLD;
+        alu_operator_o_mode  = ALU_MODE_OLD;
       end
     endcase
   end

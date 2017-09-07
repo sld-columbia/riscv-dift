@@ -207,6 +207,7 @@ module riscv_id_stage
     input  logic [31:0] tcr_i,                             // From CRS
     input  logic        pc_id_i_tag,                       // From IF
     input  logic        pc_enable_i_tag,                   // From EX
+    input  logic        rs1_i_tag,                         // From EX
     output logic        jump_target_o_tag,                 // To IF
     output logic        pc_ex_o_tag,                       // To CSR (?)
     output logic        pc_set_o_tag,                      // To IF
@@ -390,6 +391,8 @@ module riscv_id_stage
   logic        enable_a;
   logic        enable_b;
   logic        branch_taken_ex_tag;
+  logic        regile_dest_tag;
+  logic        regfile_enable_tag;
 `endif
 
   assign instr = instr_rdata_i;
@@ -891,8 +894,8 @@ module riscv_id_stage
 
     // Write port a
     .waddr_a_i    ( regfile_waddr_wb_i ),
-    .wdata_a_i    ( regfile_wdata_wb_i_tag ),
-    .we_a_i       ( regfile_we_wb_i    ),
+    .wdata_a_i    ( regfile_dest_tag   ),
+    .we_a_i       ( regfile_enable_tag ),
 
     // Write port b
     .waddr_b_i    ( regfile_alu_waddr_fw_i ),
@@ -1028,6 +1031,34 @@ module riscv_id_stage
     .is_store_o                      ( is_store                  ),
     .enable_a_o                      ( enable_a                  ),
     .enable_b_o                      ( enable_b                  )
+  );
+`endif
+
+///////////////////////////////////////////////////////////////////////
+//   _     ___    _    ____                                          //
+//  | |   / _ \  / \  |  _ \                                         //
+//  | |  | | | |/ _ \ | | | |                                        //
+//  | |__| |_| / ___ \| |_| |                                        //
+//  |_____\___/_/   \_\____/                                         //
+//                                                                   //
+//  ____  ____   ___  ____   _    ____    _  _____ ___ ___  _   _    //
+//  |  _ \|  _ \ / _ \|  _ \ / \  / ___|  / \|_   _|_ _/ _ \| \ | |  //
+//  | |_) | |_) | | | | |_) / _ \| |  _  / _ \ | |  | | | | |  \| |  //
+//  |  __/|  _ <| |_| |  __/ ___ \ |_| |/ ___ \| |  | | |_| | |\  |  //
+//  |_|   |_| \_\\___/|_| /_/   \_\____/_/   \_\_| |___\___/|_| \_|  //
+//                                                                   //
+///////////////////////////////////////////////////////////////////////                                                                        
+
+`ifdef DIFT
+  riscv_load_propagation load_i_propagation
+  (
+    .regfile_wdata_wb_i_tag          ( regfile_wdata_wb_i_tag    ),
+    .rs1_i_tag                       ( rs1_i_tag                 ),
+    .regfile_we_wb_i                 ( regfile_we_wb_i           ),
+    .tpr_i                           ( tpr_i                     ),
+
+    .regfile_dest_tag                ( regfile_dest_tag          ),
+    .regfile_enable_tag              ( regfile_enable_tag        )
   );
 `endif
 
@@ -1429,12 +1460,12 @@ module riscv_id_stage
           alu_operator_o_mode           <= alu_operator_mode;
           if (is_store) begin
             if (enable_a) begin
-              alu_operand_a_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address
+              alu_operand_a_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address tag
             end else begin
               alu_operand_a_ex_o_tag    <= '0;
             end
 	          if (enable_b) begin
-	            alu_operand_b_ex_o_tag    <= alu_operand_c_tag;  // RS2: source
+	            alu_operand_b_ex_o_tag    <= alu_operand_c_tag;  // RS2: source tag
             end else begin
               alu_operand_b_ex_o_tag    <= '0;
             end

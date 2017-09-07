@@ -105,7 +105,8 @@ module riscv_ex_stage
   output logic        jump_target_o_tag,
   output logic        pc_enable_o_tag,
   output logic        data_wdata_ex_o_tag,
-  output logic        data_we_ex_o_tag
+  output logic        data_we_ex_o_tag,
+  output logic        rs1_o_tag
 `endif
 );
 
@@ -139,7 +140,7 @@ module riscv_ex_stage
   assign regfile_alu_wdata_fw_o_tag = alu_result_tag;
   assign regfile_alu_we_fw_o_tag    = rf_enable_tag & regfile_alu_we_i;
 
-  assign data_wdata_ex_o_tag        = alu_result_tag;
+  assign data_wdata_ex_o_tag        = alu_result_tag;  // M[RS1+offset]: destination tag
   assign data_we_ex_o_tag           = data_we_ex_i & rf_enable_tag;
 
   // if (branch is not taken)
@@ -267,17 +268,36 @@ module riscv_ex_stage
     begin
       if (ex_valid_o) // wb_ready_i is implied
       begin
-        regfile_we_wb_o <= regfile_we_i;
+        regfile_we_wb_o      <= regfile_we_i;
         if (regfile_we_i) begin
           regfile_waddr_wb_o <= regfile_waddr_i;
         end
       end else if (wb_ready_i) begin
         // we are ready for a new instruction, but there is none available,
         // so we just flush the current one out of the pipe
-        regfile_we_wb_o <= 1'b0;
+        regfile_we_wb_o      <= 1'b0;
       end
     end
   end
+
+`ifdef DIFT
+  always_ff @(posedge clk, negedge rst_n)
+  begin : EX_WB_Pipeline_Register
+    if (~rst_n)
+    begin
+      rs1_o_tag            <= 1'b0;
+    end
+    else
+    begin
+      if (ex_valid_o) // wb_ready_i is implied
+      begin
+        if (regfile_we_i) begin
+          rs1_o_tag          <= alu_operand_a_i_tag;
+        end
+      end
+    end
+  end
+`endif
 
   // As valid always goes to the right and ready to the left, and we are able
   // to finish branches without going to the WB stage, ex_valid does not
