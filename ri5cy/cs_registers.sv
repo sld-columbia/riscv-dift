@@ -58,10 +58,10 @@ module riscv_cs_registers
   // Interrupts
   output logic        irq_enable_o,
   output logic [31:0] mepc_o,
-  `ifdef DIFT
-    output logic [31:0] tpr_o,
-    output logic [31:0] tcr_o,
-  `endif
+`ifdef DIFT
+  output logic [31:0] tpr_o,
+  output logic [31:0] tcr_o,
+`endif
   input  logic [31:0] pc_if_i,
   input  logic [31:0] pc_id_i,
   input  logic [31:0] pc_ex_i,

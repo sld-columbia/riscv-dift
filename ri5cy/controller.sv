@@ -127,6 +127,12 @@ module riscv_controller
   output logic        perf_jump_o,                // we are executing a jump instruction   (j, jr, jal, jalr)
   output logic        perf_jr_stall_o,            // stall due to jump-register-hazard
   output logic        perf_ld_stall_o             // stall due to load-use-hazard
+
+`ifdef DIFT
+  ,
+  input  logic        branch_taken_ex_i_tag,
+  output logic        pc_set_o_tag
+`endif
 );
 
   // FSM state encoding
@@ -174,6 +180,9 @@ module riscv_controller
 
     pc_mux_o         = PC_BOOT;
     pc_set_o         = 1'b0;
+`ifdef DIFT
+    pc_set_o_tag     = 1'b0;
+`endif
     jump_done        = jump_done_q;
 
     ctrl_fsm_ns      = ctrl_fsm_cs;
@@ -365,6 +374,13 @@ module riscv_controller
             ctrl_fsm_ns = DBG_SIGNAL;
           end
         end
+
+`ifdef DIFT
+        if (branch_taken_ex_i_tag) begin
+          pc_set_o_tag  = 1'b1;
+        end
+`endif
+
       end
 
       // a branch was in ID when a debug trap is hit
@@ -377,6 +393,12 @@ module riscv_controller
           pc_mux_o = PC_BRANCH;
           pc_set_o = 1'b1;
         end
+
+`ifdef DIFT
+        if (branch_taken_ex_i_tag) begin
+          pc_set_o_tag = 1'b1;
+        end
+`endif
 
         ctrl_fsm_ns = DBG_SIGNAL;
       end

@@ -67,7 +67,21 @@ module riscv_load_store_unit
 
     input  logic         ex_valid_i,
     output logic         busy_o
+
+`ifdef DIFT
+    ,
+    output logic         data_we_o_tag,
+    output logic         data_wdata_o_tag,
+    input  logic [3:0]   data_rdata_i_tag,
+    input  logic         data_we_ex_i_tag,
+    input  logic         data_wdata_ex_i_tag,
+    output logic         data_rdata_ex_o_tag
+`endif
 );
+
+`ifdef DIFT
+  logic         data_we_q_tag;
+`endif
 
   logic [31:0]  data_addr_int;
 
@@ -177,6 +191,20 @@ module riscv_load_store_unit
       data_we_q       <= data_we_ex_i;
     end
   end
+
+`ifdef DIFT
+  always_ff @(posedge clk, negedge rst_n)
+  begin
+    if(rst_n == 1'b0)
+    begin
+      data_we_q_tag   <= 1'b0;
+    end
+    else if (data_gnt_i == 1'b1) // request was granted, we wait for rvalid and can continue to WB
+    begin
+      data_we_q_tag   <= data_we_ex_i_tag;
+    end
+  end
+`endif
 
 
   ////////////////////////////////////////////////////////////////////////
@@ -326,6 +354,11 @@ module riscv_load_store_unit
   assign data_wdata_o  = data_wdata;
   assign data_we_o     = data_we_ex_i;
   assign data_be_o     = data_be;
+
+`ifdef DIFT
+  assign data_wdata_o_tag = data_wdata_ex_i_tag;
+  assign data_we_o_tag    = data_we_ex_i_tag;
+`endif
 
   assign misaligned_st = data_misaligned_ex_i;
 

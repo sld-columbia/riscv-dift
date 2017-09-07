@@ -57,7 +57,6 @@ module riscv_id_stage
     input  logic       [31:0] instr_rdata_i,      // comes from pipeline of IF stage
     output logic              instr_req_o,
 
-
     // Jumps and branches
     output logic        branch_in_ex_o,
     input  logic        branch_decision_i,
@@ -204,11 +203,13 @@ module riscv_id_stage
     input  logic        regfile_wdata_wb_i_tag,            // From WB stage
     input  logic        regfile_alu_wdata_fw_i_tag,        // From tags ALU (EX stage)
     input  logic        regfile_alu_we_fw_i_tag,           // From tags ALU (EX stage)
-    input  logic [31:0] tpr_i,                             // From CRS       
+    input  logic [31:0] tpr_i,                             // From CRS
     input  logic [31:0] tcr_i,                             // From CRS
     input  logic        pc_id_i_tag,                       // From IF
+    input  logic        pc_enable_i_tag,                   // From EX
     output logic        jump_target_o_tag,                 // To IF
     output logic        pc_ex_o_tag,                       // To CSR (?)
+    output logic        pc_set_o_tag,                      // To IF
     output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode, // To EX
     output logic        alu_operand_a_ex_o_tag,            // To EX
     output logic        alu_operand_b_ex_o_tag,            // To EX
@@ -388,6 +389,7 @@ module riscv_id_stage
   logic        is_store;
   logic        enable_a;
   logic        enable_b;
+  logic        branch_taken_ex_tag;
 `endif
 
   assign instr = instr_rdata_i;
@@ -462,6 +464,10 @@ module riscv_id_stage
   assign clear_instr_valid_o = id_ready_o | halt_id;
 
   assign branch_taken_ex = branch_in_ex_o & branch_decision_i;
+
+`ifdef DIFT
+  assign branch_taken_ex_tag = branch_in_ex_o & pc_enable_i_tag;
+`endif
 
   assign mult_en = mult_int_en | mult_dot_en;
 
@@ -589,7 +595,7 @@ module riscv_id_stage
     endcase; // case (operand_a_fw_mux_sel)
   end
 
-  `ifdef DIFT
+`ifdef DIFT
     // ALU_Op_a Mux
     always_comb
     begin : alu_operand_a_mux_tag
@@ -612,7 +618,7 @@ module riscv_id_stage
         default:       operand_a_fw_id_tag = regfile_data_ra_id_tag;
       endcase;
     end
-  `endif
+`endif
 
   //////////////////////////////////////////////////////
   //   ___                                 _   ____   //
@@ -681,7 +687,7 @@ module riscv_id_stage
     endcase; // case (operand_b_fw_mux_sel)
   end
 
-  `ifdef DIFT
+`ifdef DIFT
     // ALU_Op_b Mux
     always_comb
     begin : alu_operand_b_mux_tag
@@ -719,7 +725,7 @@ module riscv_id_stage
         default:       operand_b_fw_id_tag = regfile_data_rb_id_tag;
       endcase; // case (operand_b_fw_mux_sel)
     end
-  `endif
+`endif
 
   //////////////////////////////////////////////////////
   //   ___                                 _    ____  //
@@ -752,7 +758,7 @@ module riscv_id_stage
     endcase; // case (operand_c_fw_mux_sel)
   end
 
-  `ifdef DIFT
+`ifdef DIFT
     // ALU OP C Mux
     always_comb
     begin : alu_operand_c_mux_tag
@@ -774,7 +780,7 @@ module riscv_id_stage
         default:       operand_c_fw_id_tag = regfile_data_rc_id_tag;
       endcase; // case (operand_c_fw_mux_sel)
     end
-  `endif
+`endif
 
   ///////////////////////////////////////////////////////////////////////////
   //  ___                              _ _       _              ___ ____   //
@@ -891,7 +897,7 @@ module riscv_id_stage
     // Write port b
     .waddr_b_i    ( regfile_alu_waddr_fw_i ),
     .wdata_b_i    ( regfile_alu_wdata_fw_i_tag ),
-    .we_b_i       ( regfile_alu_we_fw_i )
+    .we_b_i       ( regfile_alu_we_fw_i_tag )
   );
 `endif
 
@@ -1063,6 +1069,9 @@ module riscv_id_stage
     // to prefetcher
     .pc_set_o                       ( pc_set_o               ),
     .pc_mux_o                       ( pc_mux_o               ),
+`ifdef DIFT
+    .pc_set_o_tag                   ( pc_set_o_tag           ),
+`endif
 
     // LSU
     .data_req_ex_i                  ( data_req_ex_o          ),
@@ -1074,6 +1083,9 @@ module riscv_id_stage
 
     // jump/branch control
     .branch_taken_ex_i              ( branch_taken_ex        ),
+`ifdef DIFT
+    .branch_taken_ex_i_tag          ( branch_taken_ex_tag    ),
+`endif
     .jump_in_id_i                   ( jump_in_id             ),
     .jump_in_dec_i                  ( jump_in_dec            ),
 
@@ -1418,12 +1430,12 @@ module riscv_id_stage
           if (is_store) begin
             if (enable_a) begin
               alu_operand_a_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address
-            end else begin 
+            end else begin
               alu_operand_a_ex_o_tag    <= '0;
             end
-	    if (enable_b) begin
-	      alu_operand_b_ex_o_tag    <= alu_operand_c_tag;  // RS2: source
-            end else begin 
+	          if (enable_b) begin
+	            alu_operand_b_ex_o_tag    <= alu_operand_c_tag;  // RS2: source
+            end else begin
               alu_operand_b_ex_o_tag    <= '0;
             end
           end else begin

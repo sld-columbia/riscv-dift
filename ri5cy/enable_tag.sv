@@ -29,9 +29,9 @@ module riscv_enable_tag
 
   always_comb
   begin
-    enable_a_o = 'x;
-    enable_b_o = 'x;
-    is_store_o = 'x;
+    enable_a_o = '0;
+    enable_b_o = '0;
+    is_store_o = '0;
 
     unique case (instr_rdata_i[6:0])
 
@@ -48,7 +48,7 @@ module riscv_enable_tag
       : begin
       end
 
-      default: ; 
+      default: ;
     endcase
   end
 

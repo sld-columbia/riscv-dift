@@ -6,7 +6,7 @@
 // Language:       SystemVerilog                                              //
 //                                                                            //
 // Description:    Tags ALU                                                   //
-//                 This unit computes the destination operant tag based on    // 
+//                 This unit computes the destination operant tag based on    //
 //                 the source operands tags and on the type of the operation  //
 //                 specified in the Tag Propagation Register                  //
 //                                                                            //
@@ -30,9 +30,9 @@ module riscv_alu_tag
 
   always_comb
   begin
-    result_o      = 'x;
-    rf_enable_tag = 'x;
-    pc_enable_tag = 'x;
+    result_o      = '0;
+    rf_enable_tag = '1;
+    pc_enable_tag = '1;
 
     unique case (operator_i)
       // Standard Operations
