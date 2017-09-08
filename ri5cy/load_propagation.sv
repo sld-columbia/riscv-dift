@@ -6,7 +6,8 @@
 // Language:       SystemVerilog                                              //
 //                                                                            //
 // Description:    This unit reads the MODE and the ENABLE field of the       //
-//                 Tag Propagation Register and computes the destination tag  //
+//                 Tag Propagation Register and computes the destination tag. //
+//                 This unit is dedicated to the LOAD operation               //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -20,7 +21,7 @@ module riscv_load_propagation
   input  logic [31:0] tpr_i,
 
   output logic        regfile_dest_tag,        // RD: destination tag
-  output logic        regfile_enable_tag
+  output logic        regfile_enable_tag       // Register file port a write enable after reading TPR
 );
 
   logic [ALU_MODE_WIDTH-1:0] alu_operator_mode;

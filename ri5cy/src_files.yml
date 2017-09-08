@@ -8,6 +8,7 @@ riscv:
     alu.sv,
     alu_div.sv,
     alu_tag.sv,
+    check_tag.sv,
     compressed_decoder.sv,
     controller.sv,
     cs_registers.sv,

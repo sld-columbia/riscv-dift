@@ -16,7 +16,7 @@
 //                 Sven Stucki - svstucki@student.ethz.ch                     //
 //                 Andreas Traber - atraber@iis.ee.ethz.ch                    //
 //                                                                            //
-// Design Name:    Excecute stage                                             //
+// Design Name:    Execute stage                                              //
 // Project Name:   RI5CY                                                      //
 // Language:       SystemVerilog                                              //
 //                                                                            //
@@ -137,12 +137,15 @@ module riscv_ex_stage
   assign jump_target_o     = alu_operand_c_i;
 
 `ifdef DIFT
+  // Register instruction except Load
   assign regfile_alu_wdata_fw_o_tag = alu_result_tag;
   assign regfile_alu_we_fw_o_tag    = rf_enable_tag & regfile_alu_we_i;
 
+  // Store
   assign data_wdata_ex_o_tag        = alu_result_tag;  // M[RS1+offset]: destination tag
   assign data_we_ex_o_tag           = data_we_ex_i & rf_enable_tag;
 
+  // Branch
   // if (branch is not taken)
   //   old PC tag is not updated;
   // else
@@ -281,6 +284,7 @@ module riscv_ex_stage
   end
 
 `ifdef DIFT
+  // Load
   always_ff @(posedge clk, negedge rst_n)
   begin : EX_WB_Pipeline_Register
     if (~rst_n)
@@ -289,10 +293,10 @@ module riscv_ex_stage
     end
     else
     begin
-      if (ex_valid_o) // wb_ready_i is implied
+      if (ex_valid_o)
       begin
         if (regfile_we_i) begin
-          rs1_o_tag          <= alu_operand_a_i_tag;
+          rs1_o_tag        <= alu_operand_a_i_tag;
         end
       end
     end

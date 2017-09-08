@@ -991,8 +991,8 @@ module riscv_decoder
   assign regfile_alu_we_o  = (deassert_we_i) ? 1'b0          : regfile_alu_we;
   assign data_req_o        = (deassert_we_i) ? 1'b0          : data_req;
   assign hwloop_we_o       = (deassert_we_i) ? 3'b0          : hwloop_we;
-  assign csr_op_o          = (deassert_we_i) ? CSR_OP_NONE  : csr_op;
-  assign jump_in_id_o      = (deassert_we_i) ? BRANCH_NONE  : jump_in_id;
+  assign csr_op_o          = (deassert_we_i) ? CSR_OP_NONE   : csr_op;
+  assign jump_in_id_o      = (deassert_we_i) ? BRANCH_NONE   : jump_in_id;
   assign ebrk_insn_o       = (deassert_we_i) ? 1'b0          : ebrk_insn;
   assign eret_insn_o       = (deassert_we_i) ? 1'b0          : eret_insn;  // TODO: do not deassert?
   assign pipe_flush_o      = (deassert_we_i) ? 1'b0          : pipe_flush; // TODO: do not deassert?
