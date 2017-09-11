@@ -21,6 +21,7 @@ riscv:
     id_stage.sv,
     if_stage.sv,
     load_propagation.sv,
+    load_check.sv,
     load_store_unit.sv,
     mode_tag.sv,
     mult.sv,
