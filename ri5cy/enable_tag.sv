@@ -15,13 +15,13 @@ import riscv_defines::*;
 
 module riscv_enable_tag
 (
-  // from IF/ID pipeline
-  input  logic [31:0] instr_rdata_i,           // instruction read from instr memory/cache
+  // From IF/ID pipeline
+  input  logic [31:0] instr_rdata_i,
 
-  // from CSRs
+  // From CSRs
   input  logic [31:0] tpr_i,
 
-  // enable signals
+  // To ID
   output logic        is_store_o,
   output logic        enable_a_o,
   output logic        enable_b_o
@@ -41,11 +41,6 @@ module riscv_enable_tag
         enable_a_o  = tpr_i[LOADSTORE_EN_DEST_ADDR];
         enable_b_o  = tpr_i[LOADSTORE_EN_SOURCE];
         is_store_o  = 1'b1;
-      end
-
-      OPCODE_LOAD
-      //OPCODE_LOAD_POST,
-      : begin
       end
 
       default: ;

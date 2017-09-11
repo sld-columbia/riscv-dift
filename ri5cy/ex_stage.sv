@@ -60,12 +60,12 @@ module riscv_ex_stage
 
   output logic        mult_multicycle_o,
 
-  // input from ID stage
+  // Input from ID stage
   input  logic        branch_in_ex_i,
   input  logic [4:0]  regfile_alu_waddr_i,
   input  logic        regfile_alu_we_i,
 
-  // directly passed through to WB stage, not used in EX
+  // Directly passed through to WB stage, not used in EX
   input  logic        regfile_we_i,
   input  logic [4:0]  regfile_waddr_i,
 
@@ -100,13 +100,17 @@ module riscv_ex_stage
   input  logic        alu_operand_b_i_tag,
   input  logic        alu_operand_c_i_tag,
   input  logic        data_we_ex_i,
+  input  logic        check_s1_i_tag,
+  input  logic        check_s2_i_tag,
+  input  logic        check_d_i_tag,
   output logic        regfile_alu_wdata_fw_o_tag,
   output logic        regfile_alu_we_fw_o_tag,
   output logic        jump_target_o_tag,
   output logic        pc_enable_o_tag,
   output logic        data_wdata_ex_o_tag,
   output logic        data_we_ex_o_tag,
-  output logic        rs1_o_tag
+  output logic        rs1_o_tag,
+  output logic        exception_o_tag
 `endif
 );
 
@@ -133,8 +137,8 @@ module riscv_ex_stage
   assign regfile_alu_waddr_fw_o = regfile_alu_waddr_i;
 
   // branch handling
-  assign branch_decision_o = alu_cmp_result;
-  assign jump_target_o     = alu_operand_c_i;
+  assign branch_decision_o      = alu_cmp_result;
+  assign jump_target_o          = alu_operand_c_i;
 
 `ifdef DIFT
   // Register instruction except Load
@@ -197,26 +201,29 @@ module riscv_ex_stage
     .ex_ready_i          ( ex_ready_o      )
   );
 
-  ///////////////////////////////////////////////////
-  //  _____  _    ____ ____       _    _    _   _  //
-  // |_   _|/ \  / ___/ ___|     / \  | |  | | | | //
-  //   | | / _ \| |  _\___ \    / _ \ | |  | | | | //
-  //   | |/ ___ \ |_| |___) |  / ___ \| |__| |_| | //
-  //   |_/_/   \_\____|____/  /_/   \_\_____\___/  //
-  //                                               //
-  ///////////////////////////////////////////////////
-
 `ifdef DIFT
-  riscv_alu_tag alu_tag_i
+  riscv_tag_propagation_logic tag_propagation_logic_i
   (
-    .clk                  ( clk                     ),
-    .rst_n,               ( rst_n                   ),
-    .operator_i,          ( alu_operator_i_mode     ),
-    .operand_a_i,         ( alu_operand_a_i_tag     ),
-    .operand_b_i,         ( alu_operand_b_i_tag     ),
-    .result_o,            ( alu_result_tag          ),
+    .operator_i           ( alu_operator_i_mode     ),
+    .operand_a_i          ( alu_operand_a_i_tag     ),
+    .operand_b_i          ( alu_operand_b_i_tag     ),
+    .is_load_i            ( regfile_we_i            ),
+    .result_o             ( alu_result_tag          ),
     .rf_enable_tag        ( rf_enable_tag           ),
     .pc_enable_tag        ( pc_enable_tag           )
+  );
+`endif
+
+`ifdef DIFT
+  riscv_tag_check_logic tag_check_logic_i
+  (
+    .operand_a_i          ( alu_operand_a_i_tag     ),
+    .operand_b_i          ( alu_operand_b_i_tag     ),
+    .result_i             ( alu_result_tag          ),
+    .check_s1_i           ( check_s1_i_tag          ),
+    .check_s2_i           ( check_s2_i_tag          ),
+    .check_d_i            ( check_d_i_tag           ),
+    .exception_o          ( exception_o_tag         ),
   );
 `endif
 

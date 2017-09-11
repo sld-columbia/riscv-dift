@@ -1,12 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Engineer        Christian Palmiero - cp3025@columbia.edu                   //
 //                                                                            //
-// Design Name:    ALU tag                                                    //
+// Design Name:    Tag Propagation Logic                                      //
 // Project Name:   RI5CY                                                      //
 // Language:       SystemVerilog                                              //
 //                                                                            //
-// Description:    Tags ALU                                                   //
-//                 This unit computes the destination operant tag based on    //
+// Description:    This unit computes the destination operand tag based on    //
 //                 the source operands tags and on the type of the operation  //
 //                 specified in the Tag Propagation Register                  //
 //                                                                            //
@@ -14,11 +13,8 @@
 
 import riscv_defines::*;
 
-module riscv_alu_tag
+module riscv_tag_propagation_logic
 (
-  input  logic                      clk,
-  input  logic                      rst_n,
-
   input  logic [ALU_MODE_WIDTH-1:0] operator_i,
   input  logic                      operand_a_i,
   input  logic                      operand_b_i,
@@ -30,7 +26,7 @@ module riscv_alu_tag
 
   always_comb
   begin
-    result_o      = 1'bx;
+    result_o      = 1'b0;
     rf_enable_tag = 1'b1;
     pc_enable_tag = 1'b1;
 

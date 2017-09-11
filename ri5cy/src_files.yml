@@ -7,7 +7,6 @@ riscv:
     include/riscv_tracer_defines.sv,
     alu.sv,
     alu_div.sv,
-    alu_tag.sv,
     check_tag.sv,
     compressed_decoder.sv,
     controller.sv,
@@ -28,6 +27,8 @@ riscv:
     prefetch_buffer.sv,
     prefetch_L0_buffer.sv,
     riscv_core.sv,
+    tag_propagation_logic.sv,
+    tag_check_logic.sv,
   ]
 riscv_vip_rtl:
   targets: [

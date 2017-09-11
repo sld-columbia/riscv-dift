@@ -166,6 +166,60 @@ parameter VEC_MODE32 = 2'b00;
 parameter VEC_MODE16 = 2'b10;
 parameter VEC_MODE8  = 2'b11;
 
+////////////////////////////////////
+//   ____ _   _ _____ ____ _  __  //
+//  / ___| | | | ____/ ___| |/ /  //
+// | |   | |_| |  _|| |   | ' /   //
+// | |___|  _  | |__| |___| . \   //
+//  \____|_| |_|_____\____|_|\_\  //
+//                                //
+////////////////////////////////////
+
+// Integer class: ADDI, ADD, SUB, MUL, MULD[[S]U], MULW, DIV[U], REM[U], DIV[U]W, REM[U]W
+parameter INTEGER_CHECK_S1      = 0;
+parameter INTEGER_CHECK_S2      = 1;
+parameter INTEGER_CHECK_D       = 2;
+// Branch class: BEQ, BNE, BLT[U], BGE[U]
+parameter BRANCH_CHECK_S1       = 3;
+parameter BRANCH_CHECK_S2       = 4;
+// Jump class: JAL, JALR
+parameter JUMP_CHECK_S1         = 5;
+parameter JUMP_CHECK_S2         = 6;
+parameter JUMP_CHECK_D          = 7;
+// Shift class: SLLI, SRLI, SRAI, SLL, SRL, SRA
+parameter SHIFT_CHECK_S1        = 8;
+parameter SHIFT_CHECK_S2        = 9;
+parameter SHIFT_CHECK_D         = 10;
+// Comparison class: SLTI[U], SLT[U]
+parameter COMPARISON_CHECK_S1   = 11;
+parameter COMPARISON_CHECK_S2   = 12;
+parameter COMPARISON_CHECK_D    = 13;
+// Logical class: ANDI, ORI, XORI, AND, OR, XOR
+parameter LOGICAL_CHECK_S1      = 14;
+parameter LOGICAL_CHECK_S2      = 15;
+parameter LOGICAL_CHECK_D       = 16;
+// Load/Store class: LW, LH[U], LB[U], SW, SH, SB, LUI, AUIPC
+parameter LOADSTORE_CHECK_S     = 17;
+parameter LOADSTORE_CHECK_SA    = 18;
+parameter LOADSTORE_CHECK_D     = 19;
+parameter LOADSTORE_CHECK_DA    = 20;
+// Execute class: PC
+parameter EXECUTE_PC            = 21;
+parameter EXECUTE_INSTRUCTION   = 22;
+
+///////////////////////////////////////////////
+//   _____ _   _    _    ____  _     _____   //
+//  | ____| \ | |  / \  | __ )| |   | ____|  //
+//  |  _| |  \| | / _ \ |  _ \| |   |  _|    //
+//  | |___| |\  |/ ___ \| |_) | |___| |___   //
+//  |_____|_| \_/_/   \_\____/|_____|_____|  //
+//                                           //
+///////////////////////////////////////////////
+
+parameter LOADSTORE_EN_SOURCE      = 15;
+parameter LOADSTORE_EN_SOURCE_ADDR = 16;
+parameter LOADSTORE_EN_DEST_ADDR   = 17;
+
 //////////////////////////////////
 //  __  __  ___  ____  _____    //
 //  |  \/  |/ _ \|  _ \| ____|  //
@@ -203,61 +257,6 @@ parameter LOGICAL_HIGH     = 11;
 // Load/Store class: LW, LH[U], LB[U], SW, SH, SB, LUI, AUIPC
 parameter LOADSTORE_LOW    = 12;
 parameter LOADSTORE_HIGH   = 13;
-
-////////////////////////////////////
-//   ____ _   _ _____ ____ _  __  //
-//  / ___| | | | ____/ ___| |/ /  //
-// | |   | |_| |  _|| |   | ' /   //
-// | |___|  _  | |__| |___| . \   //
-//  \____|_| |_|_____\____|_|\_\  //
-//                                //
-////////////////////////////////////
-
-// Integer class: ADDI, ADD, SUB, MUL, MULD[[S]U], MULW, DIV[U], REM[U], DIV[U]W, REM[U]W
-parameter INTEGER_CHECK_S1      = 0;
-parameter INTEGER_CHECK_S2      = 1;
-parameter INTEGER_CHECK_D       = 2;
-// Branch class: BEQ, BNE, BLT[U], BGE[U]
-parameter BRANCH_CHECK_S1       = 3;
-parameter BRANCH_CHECK_S2       = 4;
-parameter BRANCH_CHECK_D        = 5;
-// Jump class: JAL, JALR
-parameter JUMP_CHECK_S1         = 6;
-parameter JUMP_CHECK_S2         = 7;
-parameter JUMP_CHECK_D          = 8;
-// Shift class: SLLI, SRLI, SRAI, SLL, SRL, SRA
-parameter SHIFT_CHECK_S1        = 9;
-parameter SHIFT_CHECK_S2        = 10;
-parameter SHIFT_CHECK_D         = 11;
-// Comparison class: SLTI[U], SLT[U]
-parameter COMPARISON_CHECK_S1   = 12;
-parameter COMPARISON_CHECK_S2   = 13;
-parameter COMPARISON_CHECK_D    = 14;
-// Logical class: ANDI, ORI, XORI, AND, OR, XOR
-parameter LOGICAL_CHECK_S1      = 15;
-parameter LOGICAL_CHECK_S2      = 16;
-parameter LOGICAL_CHECK_D       = 17;
-// Load/Store class: LW, LH[U], LB[U], SW, SH, SB, LUI, AUIPC
-parameter LOADSTORE_CHECK_S1    = 18;
-parameter LOADSTORE_CHECK_SA    = 19;
-parameter LOADSTORE_CHECK_D     = 20;
-parameter LOADSTORE_CHECK_DA    = 21;
-// Execute class: PC
-parameter EXECUTE_PC            = 22;
-parameter EXECUTE_INSTRUCTION   = 23;
-
-///////////////////////////////////////////////
-//   _____ _   _    _    ____  _     _____   //
-//  | ____| \ | |  / \  | __ )| |   | ____|  //
-//  |  _| |  \| | / _ \ |  _ \| |   |  _|    //
-//  | |___| |\  |/ ___ \| |_) | |___| |___   //
-//  |_____|_| \_/_/   \_\____/|_____|_____|  //
-//                                           //
-///////////////////////////////////////////////
-
-parameter LOADSTORE_EN_SOURCE      = 15;
-parameter LOADSTORE_EN_SOURCE_ADDR = 16;
-parameter LOADSTORE_EN_DEST_ADDR   = 17;
 
 /////////////////////////////////////////////////////////
 //    ____ ____    ____            _     _             //
