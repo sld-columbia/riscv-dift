@@ -26,6 +26,8 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+`include "riscv_config.sv"
+
 import riscv_defines::*;
 
 module riscv_ex_stage
@@ -157,15 +159,18 @@ module riscv_ex_stage
   //     new PC tag is equal to 1;
   //   else
   //     new PC tag is the result of the policy applied on the source operands;
-  if (~alu_cmp_result) begin
-    pc_enable_o_tag = 1'b0;
-  end else begin
-    if (alu_operand_c_i_tag) begin
-      pc_enable_o_tag   = 1'b1;
-      jump_target_o_tag = alu_operand_c_i_tag;
+  always_comb
+  begin
+    if (~alu_cmp_result) begin
+      pc_enable_o_tag = 1'b0;
     end else begin
-      pc_enable_o_tag   = pc_enable_tag;
-      jump_target_o_tag = alu_result_tag;
+      if (alu_operand_c_i_tag) begin
+        pc_enable_o_tag   = 1'b1;
+        jump_target_o_tag = alu_operand_c_i_tag;
+      end else begin
+        pc_enable_o_tag   = pc_enable_tag;
+        jump_target_o_tag = alu_result_tag;
+      end
     end
   end
 `endif
@@ -216,7 +221,6 @@ module riscv_ex_stage
     .operator_i           ( alu_operator_i_mode     ),
     .operand_a_i          ( alu_operand_a_i_tag     ),
     .operand_b_i          ( alu_operand_b_i_tag     ),
-    .is_load_i            ( regfile_we_i            ),
     .result_o             ( alu_result_tag          ),
     .rf_enable_tag        ( rf_enable_tag           ),
     .pc_enable_tag        ( pc_enable_tag           )
@@ -232,7 +236,8 @@ module riscv_ex_stage
     .check_s1_i           ( check_s1_i_tag          ),
     .check_s2_i           ( check_s2_i_tag          ),
     .check_d_i            ( check_d_i_tag           ),
-    .exception_o          ( exception_o_tag         ),
+    .is_load_i            ( regfile_we_i            ),
+    .exception_o          ( exception_o_tag         )
   );
 `endif
 
@@ -302,7 +307,7 @@ module riscv_ex_stage
 `ifdef DIFT
   // Load
   always_ff @(posedge clk, negedge rst_n)
-  begin : EX_WB_Pipeline_Register
+  begin
     if (~rst_n)
     begin
       rs1_o_tag            <= 1'b0;

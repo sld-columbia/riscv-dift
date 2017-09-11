@@ -136,10 +136,10 @@ module riscv_cs_registers
   logic [ 0:0] mstatus_q, mstatus_n;
   logic [ 5:0] exc_cause, exc_cause_n;
 
-  `ifdef DIFT
-    logic [31:0] tpr_q, tpr_n;
-    logic [31:0] tcr_q, tcr_n;
-  `endif
+`ifdef DIFT
+  logic [31:0] tpr_q, tpr_n;
+  logic [31:0] tcr_q, tcr_n;
+`endif
 
   ////////////////////////////////////////////
   //   ____ ____  ____    ____              //
@@ -179,10 +179,10 @@ module riscv_cs_registers
       12'h7B5: csr_rdata_int = hwlp_end_i[1];
       12'h7B6: csr_rdata_int = hwlp_cnt_i[1];
 
-      `ifdef DIFT
-        12'h700: csr_rdata_int = tpr_q;
-        12'h701: csr_rdata_int = tcr_q;
-      `endif
+    `ifdef DIFT
+      12'h700: csr_rdata_int = tpr_q;
+      12'h701: csr_rdata_int = tcr_q;
+    `endif
 
       12'h7C0: csr_rdata_int = {29'b0, 2'b11, mestatus_q};
     endcase
@@ -199,10 +199,10 @@ module riscv_cs_registers
     hwlp_we_o    = '0;
     hwlp_regid_o = '0;
 
-    `ifdef DIFT
-      tpr_n = tpr_q;
-      tcr_n = tcr_q;
-    `endif
+  `ifdef DIFT
+    tpr_n = tpr_q;
+    tcr_n = tcr_q;
+  `endif
 
     case (csr_addr_i)
       // mstatus: IE bit
@@ -221,10 +221,10 @@ module riscv_cs_registers
       12'h7B5: if (csr_we_int) begin hwlp_we_o = 3'b010; hwlp_regid_o = 1'b1; end
       12'h7B6: if (csr_we_int) begin hwlp_we_o = 3'b100; hwlp_regid_o = 1'b1; end
 
-      `ifdef DIFT
-        12'h700: if (csr_we_int) tpr_n = csr_wdata_int;
-        12'h701: if (csr_we_int) tcr_n = csr_wdata_int;
-      `endif
+    `ifdef DIFT
+      12'h700: if (csr_we_int) tpr_n = csr_wdata_int;
+      12'h701: if (csr_we_int) tcr_n = csr_wdata_int;
+    `endif
 
       // mestatus: machine exception status
       12'h7C0: if (csr_we_int) mestatus_n = csr_wdata_int[0];
@@ -292,11 +292,10 @@ module riscv_cs_registers
   assign irq_enable_o = mstatus_q[0];
   assign mepc_o       = mepc_q;
 
-  `ifdef DIFT
-    assign tpr_o = tpr_q;
-    assign tcr_o = tcr_q;
-  `endif
-
+`ifdef DIFT
+  assign tpr_o = tpr_q;
+  assign tcr_o = tcr_q;
+`endif
 
   // actual registers
   always_ff @(posedge clk, negedge rst_n)
@@ -308,10 +307,10 @@ module riscv_cs_registers
       mestatus_q <= '0;
       exc_cause  <= '0;
 
-      `ifdef DIFT
-        tpr_q = '0;
-        tcr_q = '0;
-      `endif
+    `ifdef DIFT
+      tpr_q = '0;
+      tcr_q = '0;
+    `endif
 
     end
     else
@@ -324,10 +323,10 @@ module riscv_cs_registers
 
       exc_cause  <= exc_cause_n;
 
-      `ifdef DIFT
-        tpr_q = tpr_n;
-        tcr_q = tcr_n;
-      `endif
+    `ifdef DIFT
+      tpr_q = tpr_n;
+      tcr_q = tcr_n;
+    `endif
 
     end
   end

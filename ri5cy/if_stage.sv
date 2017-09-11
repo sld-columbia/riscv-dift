@@ -25,6 +25,8 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+`include "riscv_config.sv"
+
 import riscv_defines::*;
 
 module riscv_if_stage
@@ -33,62 +35,70 @@ module riscv_if_stage
   parameter RDATA_WIDTH = 32
 )
 (
-    input  logic        clk,
-    input  logic        rst_n,
+  input  logic        clk,
+  input  logic        rst_n,
 
-    // the boot address is used to calculate the exception offsets
-    input  logic [31:0] boot_addr_i,
+  // the boot address is used to calculate the exception offsets
+  input  logic [31:0] boot_addr_i,
 
-    // instruction request control
-    input  logic        req_i,
+  // instruction request control
+  input  logic        req_i,
 
-    // instruction cache interface
-    output logic                   instr_req_o,
-    output logic            [31:0] instr_addr_o,
-    input  logic                   instr_gnt_i,
-    input  logic                   instr_rvalid_i,
-    input  logic [RDATA_WIDTH-1:0] instr_rdata_i,
+  // instruction cache interface
+  output logic                   instr_req_o,
+  output logic            [31:0] instr_addr_o,
+  input  logic                   instr_gnt_i,
+  input  logic                   instr_rvalid_i,
+  input  logic [RDATA_WIDTH-1:0] instr_rdata_i,
 
-    // Output of IF Pipeline stage
-    output logic [N_HWLP-1:0] hwlp_dec_cnt_id_o,     // currently served instruction was the target of a hwlp
-    output logic              is_hwlp_id_o,          // currently served instruction was the target of a hwlp
-    output logic              instr_valid_id_o,      // instruction in IF/ID pipeline is valid
-    output logic       [31:0] instr_rdata_id_o,      // read instruction is sampled and sent to ID stage for decoding
-    output logic              is_compressed_id_o,    // compressed decoder thinks this is a compressed instruction
-    output logic              illegal_c_insn_id_o,   // compressed decoder thinks this is an invalid instruction
-    output logic       [31:0] pc_if_o,
-    output logic       [31:0] pc_id_o,
+  // Output of IF Pipeline stage
+  output logic [N_HWLP-1:0] hwlp_dec_cnt_id_o,     // currently served instruction was the target of a hwlp
+  output logic              is_hwlp_id_o,          // currently served instruction was the target of a hwlp
+  output logic              instr_valid_id_o,      // instruction in IF/ID pipeline is valid
+  output logic       [31:0] instr_rdata_id_o,      // read instruction is sampled and sent to ID stage for decoding
+  output logic              is_compressed_id_o,    // compressed decoder thinks this is a compressed instruction
+  output logic              illegal_c_insn_id_o,   // compressed decoder thinks this is an invalid instruction
+  output logic       [31:0] pc_if_o,
+  output logic       [31:0] pc_id_o,
 
-    // Forwarding ports - control signals
-    input  logic        clear_instr_valid_i,   // clear instruction valid bit in IF/ID pipe
-    input  logic        pc_set_i,              // set the program counter to a new value
-    input  logic [31:0] exception_pc_reg_i,    // address used to restore PC when the interrupt/exception is served
-    input  logic  [2:0] pc_mux_i,              // sel for pc multiplexer
-    input  logic  [1:0] exc_pc_mux_i,          // selects ISR address
-    input  logic  [4:0] exc_vec_pc_mux_i,      // selects ISR address for vectorized interrupt lines
+  // Forwarding ports - control signals
+  input  logic        clear_instr_valid_i,   // clear instruction valid bit in IF/ID pipe
+  input  logic        pc_set_i,              // set the program counter to a new value
+  input  logic [31:0] exception_pc_reg_i,    // address used to restore PC when the interrupt/exception is served
+  input  logic  [2:0] pc_mux_i,              // sel for pc multiplexer
+  input  logic  [1:0] exc_pc_mux_i,          // selects ISR address
+  input  logic  [4:0] exc_vec_pc_mux_i,      // selects ISR address for vectorized interrupt lines
 
-    // jump and branch target and decision
-    input  logic [31:0] jump_target_id_i,      // jump target address
-    input  logic [31:0] jump_target_ex_i,      // branch target address
+  // jump and branch target and decision
+  input  logic [31:0] jump_target_id_i,      // jump target address
+  input  logic [31:0] jump_target_ex_i,      // branch target address
 
-    // from hwloop controller
-    input  logic [N_HWLP-1:0] [31:0] hwlp_start_i,          // hardware loop start addresses
-    input  logic [N_HWLP-1:0] [31:0] hwlp_end_i,            // hardware loop end addresses
-    input  logic [N_HWLP-1:0] [31:0] hwlp_cnt_i,            // hardware loop counters
+  // from hwloop controller
+  input  logic [N_HWLP-1:0] [31:0] hwlp_start_i,          // hardware loop start addresses
+  input  logic [N_HWLP-1:0] [31:0] hwlp_end_i,            // hardware loop end addresses
+  input  logic [N_HWLP-1:0] [31:0] hwlp_cnt_i,            // hardware loop counters
 
-    // from debug unit
-    input  logic [31:0] dbg_jump_addr_i,
-    input  logic        dbg_jump_req_i,
+  // from debug unit
+  input  logic [31:0] dbg_jump_addr_i,
+  input  logic        dbg_jump_req_i,
 
-    // pipeline stall
-    input  logic        halt_if_i,
-    output logic        if_ready_o,
-    input  logic        id_ready_i,
-    output logic        if_valid_o,
+  // pipeline stall
+  input  logic        halt_if_i,
+  output logic        if_ready_o,
+  input  logic        id_ready_i,
+  output logic        if_valid_o,
 
-    // misc signals
-    output logic        if_busy_o,             // is the IF stage busy fetching instructions?
-    output logic        perf_imiss_o           // Instruction Fetch Miss
+  // misc signals
+  output logic        if_busy_o,             // is the IF stage busy fetching instructions?
+  output logic        perf_imiss_o           // Instruction Fetch Miss
+
+`ifdef DIFT
+  ,
+  input  logic        jump_target_id_i_tag,
+  input  logic        jump_target_ex_i_tag,
+  input  logic        pc_set_i_tag,
+  output logic        pc_id_o_tag
+`endif
 );
 
   // offset FSM
@@ -114,6 +124,10 @@ module riscv_if_stage
   logic       [31:0] hwlp_target;
   logic [N_HWLP-1:0] hwlp_dec_cnt, hwlp_dec_cnt_if;
 
+`ifdef DIFT
+  logic              fetch_addr_n_tag;
+  logic              pc_if_o_tag;
+`endif
 
   // exception PC selection mux
   always_comb
@@ -147,6 +161,20 @@ module riscv_if_stage
       default:;
     endcase
   end
+
+`ifdef DIFT
+  always_comb
+  begin
+    fetch_addr_n_tag = 1'bx;
+
+    unique case (pc_mux_i)
+      PC_BOOT:      fetch_addr_n_tag = 1'b0;
+      PC_JUMP:      fetch_addr_n_tag = jump_target_id_i_tag;
+      PC_BRANCH:    fetch_addr_n_tag = jump_target_ex_i_tag;
+      default:;
+    endcase
+  end
+`endif
 
   generate
     if (RDATA_WIDTH == 32) begin : prefetch_32
@@ -301,6 +329,18 @@ module riscv_if_stage
 
   assign perf_imiss_o    = (~fetch_valid) | branch_req;
 
+`ifdef DIFT
+  always_ff @(posedge clk, negedge rst_n)
+  begin
+    if (rst_n == 1'b0)
+    begin
+      pc_if_o_tag <= 1'b0;
+    end else if (pc_set_i_tag) begin
+      pc_if_o_tag <= fetch_addr_n_tag;
+    end
+  end
+`endif
+
 
   // compressed instruction decoding, or more precisely compressed instruction
   // expander
@@ -367,6 +407,21 @@ module riscv_if_stage
 
     end
   end
+
+`ifdef DIFT
+  always_ff @(posedge clk, negedge rst_n)
+  begin
+    if (rst_n == 1'b0)
+    begin
+      pc_id_o_tag           <= 1'b0;
+    end else begin
+      if (if_valid_o)
+      begin
+        pc_id_o_tag         <= pc_if_o_tag;
+      end
+    end
+  end
+`endif
 
   assign is_hwlp_id_o = is_hwlp_id_q & instr_valid_id_o;
 

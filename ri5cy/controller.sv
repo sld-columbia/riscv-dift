@@ -24,6 +24,8 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+`include "riscv_config.sv"
+
 import riscv_defines::*;
 
 module riscv_controller
@@ -216,7 +218,9 @@ module riscv_controller
         instr_req_o   = 1'b1;
         pc_mux_o      = PC_BOOT;
         pc_set_o      = 1'b1;
-
+`ifdef DIFT
+        pc_set_o_tag  = 1'b1;
+`endif
         ctrl_fsm_ns = FIRST_FETCH;
       end
 
@@ -287,8 +291,11 @@ module riscv_controller
 
             // if there is a jr stall, wait for it to be gone
             if ((~jr_stall_o) && (~jump_done_q)) begin
-              pc_set_o    = 1'b1;
-              jump_done   = 1'b1;
+              pc_set_o     = 1'b1;
+`ifdef DIFT
+              pc_set_o_tag = 1'b1;
+`endif
+              jump_done    = 1'b1;
             end
 
             // we don't have to change our current state here as the prefetch

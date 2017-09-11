@@ -20,6 +20,7 @@ module riscv_load_check
   input  logic        rs1_i_tag,               // RS1: source address tag
   input  logic        regfile_dest_tag,        // RD: destination tag
   input  logic [31:0] tcr_i,
+  input  logic        regfile_we_wb_i,
 
   output logic        exception_o
 );
@@ -34,10 +35,12 @@ module riscv_load_check
 
   always_comb
   begin
-    if ((regfile_wdata_wb_i_tag & check_s) || (rs1_i_tag & check_sa) || (regfile_dest_tag & check_d)) begin
-      exception_o = 1'b1;
-    end else begin
-      exception_o = 1'b0;
+    if (regfile_we_wb_i) begin
+      if ((regfile_wdata_wb_i_tag & check_s) || (rs1_i_tag & check_sa) || (regfile_dest_tag & check_d)) begin
+        exception_o = 1'b1;
+      end else begin
+        exception_o = 1'b0;
+      end
     end
   end
 

@@ -208,6 +208,7 @@ module riscv_id_stage
     input  logic        pc_id_i_tag,                       // From IF
     input  logic        pc_enable_i_tag,                   // From EX
     input  logic        rs1_i_tag,                         // From EX
+    input  logic        exception_i_tag,                   // From EX
     output logic        jump_target_o_tag,                 // To IF
     output logic        pc_ex_o_tag,                       // To CSR (?)
     output logic        pc_set_o_tag,                      // To IF
@@ -217,8 +218,7 @@ module riscv_id_stage
     output logic        alu_operand_c_ex_o_tag,            // To EX
     output logic        check_s1_o_tag,                    // To EX
     output logic        check_s2_o_tag,                    // To EX
-    output logic        check_d_o_tag,                     // To EX
-    output logic        execute_pc_o_tag                   // To IF
+    output logic        check_d_o_tag                      // To EX
 `endif
 );
 
@@ -228,6 +228,7 @@ module riscv_id_stage
   logic        deassert_we;
 
   logic        illegal_insn_dec;
+  logic        illegal_insn_dec_dift;
   logic        ebrk_insn;
   logic        eret_insn_dec;
   logic        ecall_insn_dec;
@@ -378,7 +379,6 @@ module riscv_id_stage
   logic        reg_d_alu_is_reg_c_id;
 
 `ifdef DIFT
-  // Register file tags interface
   logic        regfile_data_ra_id_tag;
   logic        regfile_data_rb_id_tag;
   logic        regfile_data_rc_id_tag;
@@ -401,6 +401,7 @@ module riscv_id_stage
   logic        check_s2_tag;
   logic        check_d_tag;
   logic        execute_pc_tag;
+  logic        exception_tag;
 `endif
 
   assign instr = instr_rdata_i;
@@ -1087,7 +1088,8 @@ module riscv_id_stage
     .rs1_i_tag                       ( rs1_i_tag                 ),
     .regfile_dest_tag                ( regfile_dest_tag          ),
     .tcr_i                           ( tcr_i                     ),
-    .exception_o                     ( exception_o               )
+    .regfile_we_wb_i                 ( regfile_we_wb_i           ),
+    .exception_o                     ( exception_tag             )
   );
 `endif
 
@@ -1112,6 +1114,12 @@ module riscv_id_stage
   );
 `endif
 
+`ifdef DIFT
+  assign illegal_insn_dec_dift = illegal_insn_dec | exception_tag | exception_i_tag | (execute_pc_tag & pc_id_i_tag);
+`else
+  assign illegal_insn_dec_dift = illegal_insn_dec;
+`endif
+
   ////////////////////////////////////////////////////////////////////
   //    ____ ___  _   _ _____ ____   ___  _     _     _____ ____    //
   //   / ___/ _ \| \ | |_   _|  _ \ / _ \| |   | |   | ____|  _ \   //
@@ -1132,7 +1140,7 @@ module riscv_id_stage
 
     // decoder related signals
     .deassert_we_o                  ( deassert_we            ),
-    .illegal_insn_i                 ( illegal_insn_dec       ),
+    .illegal_insn_i                 ( illegal_insn_dec_dift  ),
     .eret_insn_i                    ( eret_insn_dec          ),
     .pipe_flush_i                   ( pipe_flush_dec         ),
 
@@ -1258,10 +1266,10 @@ module riscv_id_stage
     .irq_i                ( irq_i            ),
     .irq_enable_i         ( irq_enable_i     ),
 
-    .ebrk_insn_i          ( is_decoding_o & ebrk_insn        ),
-    .illegal_insn_i       ( is_decoding_o & illegal_insn_dec ),
-    .ecall_insn_i         ( is_decoding_o & ecall_insn_dec   ),
-    .eret_insn_i          ( is_decoding_o & eret_insn_dec    ),
+    .ebrk_insn_i          ( is_decoding_o & ebrk_insn             ),
+    .illegal_insn_i       ( is_decoding_o & illegal_insn_dec_dift ),
+    .ecall_insn_i         ( is_decoding_o & ecall_insn_dec        ),
+    .eret_insn_i          ( is_decoding_o & eret_insn_dec         ),
 
     .lsu_load_err_i       ( lsu_load_err_i   ),
     .lsu_store_err_i      ( lsu_store_err_i  ),
@@ -1495,7 +1503,6 @@ module riscv_id_stage
       check_s1_o_tag              <= '0;
       check_s2_o_tag              <= '0;
       check_d_o_tag               <= '0;
-      execute_pc_o_tag            <= '0;
     end
     else if (data_misaligned_i) begin
       if (ex_ready_i)
@@ -1512,8 +1519,6 @@ module riscv_id_stage
           check_s1_o_tag                <= check_s1_tag;
           check_s2_o_tag                <= check_s2_tag;
           check_d_o_tag                 <= check_d_tag;
-          execute_pc_o_tag              <= execute_pc_tag;
-
           if (is_store) begin
             if (enable_a) begin
               alu_operand_a_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address tag

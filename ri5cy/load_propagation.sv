@@ -39,7 +39,7 @@ module riscv_load_propagation
   always_comb
   begin
     if (regfile_we_wb_i) begin
-      regfile_dest_tag   = 1'bx;
+      regfile_dest_tag   = 1'b0;
       regfile_enable_tag = 1'b1;
 
       unique case (alu_operator_mode)

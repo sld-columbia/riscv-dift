@@ -84,6 +84,13 @@ module riscv_core
   output logic        core_busy_o,
 
   input  logic [N_EXT_PERF_COUNTERS-1:0] ext_perf_counters_i
+
+`ifdef DIFT
+  ,
+  input  logic [3:0]  data_rdata_i_tag,
+  output logic        data_we_o_tag,
+  output logic        data_wdata_o_tag
+`endif
 );
 
   localparam N_HWLP      = 2;
@@ -258,6 +265,26 @@ module riscv_core
   logic        perf_jr_stall;
   logic        perf_ld_stall;
 
+`ifdef DIFT
+  logic [31:0] tpr;
+  logic [31:0] tcr;
+  logic        jump_target_id_tag;
+  logic        jump_target_ex_tag;
+  logic        pc_set_tag;
+  logic        pc_id_tag;
+  logic        regfile_alu_wdata_fw_tag;
+  logic        regfile_alu_we_fw_tag;
+  logic        pc_enable_tag;
+  logic        rs1_tag;
+  logic        exception_tag;
+  logic [ALU_MODE_WIDTH-1:0] alu_operator_mode;
+  logic        alu_operand_a_tag;
+  logic        alu_operand_b_tag;
+  logic        alu_operand_c_tag;
+  logic        data_we_ex_tag;
+  logic        data_wdata_ex_tag;
+  logic        data_rdata_ex_tag;
+`endif
 
   //////////////////////////////////////////////////////////////////////////////////////////////
   //   ____ _            _      __  __                                                   _    //
@@ -367,6 +394,13 @@ module riscv_core
 
     .if_busy_o           ( if_busy           ),
     .perf_imiss_o        ( perf_imiss        )
+`ifdef DIFT
+    ,
+    .jump_target_id_i_tag ( jump_target_id_tag ),
+    .jump_target_ex_i_tag ( jump_target_ex_tag ),
+    .pc_set_i_tag         ( pc_set_tag         ),
+    .pc_id_o_tag          ( pc_id_tag          )
+`endif
   );
 
 
@@ -535,6 +569,28 @@ module riscv_core
     .perf_jump_o                  ( perf_jump            ),
     .perf_jr_stall_o              ( perf_jr_stall        ),
     .perf_ld_stall_o              ( perf_ld_stall        )
+`ifdef DIFT
+    ,
+    .regfile_wdata_wb_i_tag       ( data_rdata_ex_tag        ),
+    .regfile_alu_wdata_fw_i_tag   ( regfile_alu_wdata_fw_tag ),
+    .regfile_alu_we_fw_i_tag      ( regfile_alu_we_fw_tag    ),
+    .tpr_i                        ( tpr                      ),
+    .tcr_i                        ( tcr                      ),
+    .pc_id_i_tag                  ( pc_id_tag                ),
+    .pc_enable_i_tag              ( pc_enable_tag            ),
+    .rs1_i_tag                    ( rs1_tag                  ),
+    .exception_i_tag              ( exception_tag            ),
+    .jump_target_o_tag            ( jump_target_id_tag       ),
+    .pc_ex_o_tag                  (                          ),
+    .pc_set_o_tag                 ( pc_set_tag               ),
+    .alu_operator_o_mode          ( alu_operator_mode        ),
+    .alu_operand_a_ex_o_tag       ( alu_operand_a_ex_tag     ),
+    .alu_operand_b_ex_o_tag       ( alu_operand_b_ex_tag     ),
+    .alu_operand_c_ex_o_tag       ( alu_operand_c_ex_tag     ),
+    .check_s1_o_tag               ( check_s1_tag             ),
+    .check_s2_o_tag               ( check_s2_tag             ),
+    .check_d_o_tag                ( check_d_tag              )
+`endif
   );
 
 
@@ -609,6 +665,25 @@ module riscv_core
     .ex_ready_o                 ( ex_ready                     ),
     .ex_valid_o                 ( ex_valid                     ),
     .wb_ready_i                 ( lsu_ready_wb                 )
+`ifdef DIFT
+    ,
+    .alu_operator_i_mode        ( alu_operator_mode            ),
+    .alu_operand_a_i_tag        ( alu_operand_a_tag            ),
+    .alu_operand_b_i_tag        ( alu_operand_b_tag            ),
+    .alu_operand_c_i_tag        ( alu_operand_c_tag            ),
+    .data_we_ex_i               ( data_we_ex                   ),
+    .check_s1_i_tag             ( check_s1_tag                 ),
+    .check_s2_i_tag             ( check_s2_tag                 ),
+    .check_d_i_tag              ( check_d_tag                  ),
+    .regfile_alu_wdata_fw_o_tag ( regfile_alu_wdata_fw_tag     ),
+    .regfile_alu_we_fw_o_tag    ( regfile_alu_we_fw_tag        ),
+    .jump_target_o_tag          ( jump_target_ex_tag           ),
+    .pc_enable_o_tag            ( pc_enable_tag                ),
+    .data_wdata_ex_o_tag        ( data_we_ex_tag               ),
+    .data_we_ex_o_tag           ( data_wdata_ex_tag            ),
+    .rs1_o_tag                  ( rs1_tag                      ),
+    .exception_o_tag            ( exception_tag                )
+`endif
   );
 
 
@@ -664,6 +739,15 @@ module riscv_core
 
     .ex_valid_i            ( ex_valid           ),
     .busy_o                ( lsu_busy           )
+`ifdef DIFT
+    ,
+    .data_we_o_tag         ( data_we_o_tag      ),
+    .data_wdata_o_tag      ( data_wdata_o_tag   ),
+    .data_rdata_i_tag      ( data_rdata_i_tag   ),
+    .data_we_ex_i_tag      ( data_we_ex_tag     ),
+    .data_wdata_ex_i_tag   ( data_wdata_ex_tag  ),
+    .data_rdata_ex_o_tag   ( data_rdata_ex_tag  )
+`endif
   );
 
   assign wb_valid = lsu_ready_wb;
@@ -740,6 +824,11 @@ module riscv_core
     .mem_store_i             ( data_req_o & data_gnt_i & data_we_o    ),
 
     .ext_counters_i          ( ext_perf_counters_i                    )
+`ifdef DIFT
+    ,
+    .tpr_o                   ( tpr                                    ),
+    .tcr_o                   ( tcr                                    )
+`endif
   );
 
   // Mux for CSR access through Debug Unit

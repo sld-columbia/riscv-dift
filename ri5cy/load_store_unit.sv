@@ -23,6 +23,8 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+`include "riscv_config.sv"
+
 module riscv_load_store_unit
 (
     input  logic         clk,
@@ -362,7 +364,7 @@ module riscv_load_store_unit
         if ((data_misaligned_ex_i == 1'b1) || (data_misaligned_o == 1'b1))
           rdata_q_tag  <= |data_rdata_i_tag;
         else
-          //rdata_q      <= data_rdata_ext;
+          ;//rdata_q      <= data_rdata_ext;
       end
     end
   end

@@ -28,7 +28,7 @@ module riscv_tag_check_logic
 
   always_comb
   begin
-    if (is_load_i) begin
+    if (~is_load_i) begin
       if ((operand_a_i & check_s1_i) || (operand_b_i & check_s2_i) || (result_i & check_d_i)) begin
         exception_o = 1'b1;
       end else begin
