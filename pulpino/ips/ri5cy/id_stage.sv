@@ -395,7 +395,7 @@ module riscv_id_stage
   logic        enable_a;
   logic        enable_b;
   logic        branch_taken_ex_tag;
-  logic        regile_dest_tag;
+  logic        regfile_dest_tag;
   logic        regfile_enable_tag;
   logic        check_s1_tag;
   logic        check_s2_tag;

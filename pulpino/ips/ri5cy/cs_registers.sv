@@ -308,7 +308,7 @@ module riscv_cs_registers
       exc_cause  <= '0;
 
     `ifdef DIFT
-      tpr_q = '0;
+      tpr_q = 32'b00000000000000001010100010101010;
       tcr_q = '0;
     `endif
 

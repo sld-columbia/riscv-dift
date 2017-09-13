@@ -35,6 +35,7 @@ module riscv_load_check
 
   always_comb
   begin
+    exception_o     = 1'b0;
     if (regfile_we_wb_i) begin
       if ((regfile_wdata_wb_i_tag & check_s) || (rs1_i_tag & check_sa) || (regfile_dest_tag & check_d)) begin
         exception_o = 1'b1;

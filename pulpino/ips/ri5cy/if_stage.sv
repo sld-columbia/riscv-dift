@@ -165,7 +165,7 @@ module riscv_if_stage
 `ifdef DIFT
   always_comb
   begin
-    fetch_addr_n_tag = 1'bx;
+    fetch_addr_n_tag = 1'b0;
 
     unique case (pc_mux_i)
       PC_BOOT:      fetch_addr_n_tag = 1'b0;

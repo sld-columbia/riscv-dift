@@ -586,9 +586,9 @@ module riscv_core
     .pc_ex_o_tag                  (                          ),
     .pc_set_o_tag                 ( pc_set_tag               ),
     .alu_operator_o_mode          ( alu_operator_mode        ),
-    .alu_operand_a_ex_o_tag       ( alu_operand_a_ex_tag     ),
-    .alu_operand_b_ex_o_tag       ( alu_operand_b_ex_tag     ),
-    .alu_operand_c_ex_o_tag       ( alu_operand_c_ex_tag     ),
+    .alu_operand_a_ex_o_tag       ( alu_operand_a_tag        ),
+    .alu_operand_b_ex_o_tag       ( alu_operand_b_tag        ),
+    .alu_operand_c_ex_o_tag       ( alu_operand_c_tag        ),
     .check_s1_o_tag               ( check_s1_tag             ),
     .check_s2_o_tag               ( check_s2_tag             ),
     .check_d_o_tag                ( check_d_tag              )
@@ -681,8 +681,8 @@ module riscv_core
     .regfile_alu_we_fw_o_tag    ( regfile_alu_we_fw_tag        ),
     .jump_target_o_tag          ( jump_target_ex_tag           ),
     .pc_enable_o_tag            ( pc_enable_tag                ),
-    .data_wdata_ex_o_tag        ( data_we_ex_tag               ),
-    .data_we_ex_o_tag           ( data_wdata_ex_tag            ),
+    .data_wdata_ex_o_tag        ( data_wdata_ex_tag            ),
+    .data_we_ex_o_tag           ( data_we_ex_tag               ),
     .rs1_o_tag                  ( rs1_tag                      ),
     .exception_o_tag            ( exception_tag                )
 `endif

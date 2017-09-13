@@ -16,7 +16,7 @@ module sp_ram_tag
   )(
     // Clock and Reset
     input  logic                    clk,
-
+    input  logic                    rstn_i,
     input  logic                    en_i,
     input  logic [ADDR_WIDTH-1:0]   addr_i,
     input  logic                    wdata_i,
@@ -33,13 +33,17 @@ module sp_ram_tag
 
   integer i;
 
-
   assign addr = addr_i[ADDR_WIDTH-1:$clog2(DATA_WIDTH/8)];
-
 
   always @(posedge clk)
   begin
-    if (en_i && we_i)
+    if (~rstn_i)
+    begin
+      for (i = 0; i < words; i++) begin
+        mem[i] <= '0;
+      end
+    end
+    else if (en_i && we_i)
     begin
       for (i = 0; i < DATA_WIDTH/8; i++) begin
         if (be_i[i])

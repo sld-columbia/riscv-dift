@@ -38,6 +38,8 @@ module riscv_load_propagation
 
   always_comb
   begin
+    regfile_dest_tag     = 1'b0;
+    regfile_enable_tag   = 1'b0;
     if (regfile_we_wb_i) begin
       regfile_dest_tag   = 1'b0;
       regfile_enable_tag = 1'b1;
