@@ -56,7 +56,6 @@ parameter OPCODE_STORE_POST = 7'h2b;
 parameter OPCODE_PULP_OP    = 7'h5b;
 parameter OPCODE_VECOP      = 7'h57;
 parameter OPCODE_HWLOOP     = 7'h7b;
-parameter OPCODE_SET        = 7'h1b;
 
 parameter REGC_S1   = 2'b10;
 parameter REGC_RD   = 2'b01;
@@ -206,7 +205,6 @@ parameter LOADSTORE_CHECK_D     = 19;
 parameter LOADSTORE_CHECK_DA    = 20;
 // Execute class: PC
 parameter EXECUTE_PC            = 21;
-parameter EXECUTE_INSTRUCTION   = 22;
 
 ///////////////////////////////////////////////
 //   _____ _   _    _    ____  _     _____   //
@@ -274,7 +272,6 @@ parameter CSR_OP_WRITE = 2'b01;
 parameter CSR_OP_SET   = 2'b10;
 parameter CSR_OP_CLEAR = 2'b11;
 
-
 // SPR for debugger, not accessible by CPU
 parameter SP_DVR0       = 16'h3000;
 parameter SP_DCR0       = 16'h3008;
@@ -285,7 +282,6 @@ parameter SP_DVR_MSB = 8'h00;
 parameter SP_DCR_MSB = 8'h01;
 parameter SP_DMR_MSB = 8'h02;
 parameter SP_DSR_MSB = 8'h04;
-
 
 ///////////////////////////////////////////////
 //   ___ ____    ____  _                     //
@@ -358,7 +354,6 @@ parameter JT_JAL  = 2'b01;
 parameter JT_JALR = 2'b10;
 parameter JT_COND = 2'b11;
 
-
 ///////////////////////////////////////////////
 //   ___ _____   ____  _                     //
 //  |_ _|  ___| / ___|| |_ __ _  __ _  ___   //
@@ -390,7 +385,6 @@ parameter EXC_OFF_RST      = 8'h80;
 parameter EXC_OFF_ILLINSN  = 8'h84;
 parameter EXC_OFF_ECALL    = 8'h88;
 parameter EXC_OFF_LSUERR   = 8'h8c;
-
 
 // Debug module
 parameter DBG_SETS_W = 6;

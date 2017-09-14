@@ -432,7 +432,7 @@ module riscv_decoder
       end
 
       OPCODE_OP: begin  // Register-Register ALU operation
-        if(instr[31:25] != 7'b1111010) begin
+        if(instr_rdata_i[31:25] != 7'b1111010) begin
           regfile_alu_we = 1'b1;
           rega_used_o    = 1'b1;
 
@@ -601,8 +601,8 @@ module riscv_decoder
               default: begin
                 illegal_insn_o = 1'b1;
               end
-            end
-          endcase
+            endcase
+          end
         end
       end
 

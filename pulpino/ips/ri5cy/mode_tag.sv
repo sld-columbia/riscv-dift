@@ -123,104 +123,102 @@ module riscv_mode_tag
         endcase
       end
 
-      OPCODE_SET: begin
-        if(instr[31:25] == 7'b1111010) begin
-          register_set_o = 1'b1;
-        end
-      end
-
       OPCODE_OP: begin
-        unique case (instr_rdata_i[14:12])
-          3'b000: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000, 7'b0100000: begin // ADD, SUB
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              7'b0000001: begin // MUL
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b001: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000: begin // SLL
-                alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
-              end
-              7'b0000001: begin // MULH
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b010: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000: begin // SLT
-                alu_operator_o_mode  = tpr_i[COMPARISON_HIGH:COMPARISON_LOW];
-              end
-              7'b0000001: begin // MULHSU
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b011: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000: begin // SLTU
-                alu_operator_o_mode  = tpr_i[COMPARISON_HIGH:COMPARISON_LOW];
-              end
-              7'b0000001: begin // MULHU
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b100: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000: begin // XOR
-                alu_operator_o_mode  = tpr_i[LOGICAL_HIGH:LOGICAL_LOW];
-              end
-              7'b0000001: begin // DIV
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b101: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000, 7'b0100000: begin // SRL, SRA
-                alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
-              end
-              7'b0000001: begin // DIVU
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b110: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000: begin // OR
-                alu_operator_o_mode  = tpr_i[LOGICAL_HIGH:LOGICAL_LOW];
-              end
-              7'b0000001: begin // REM
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          3'b111: begin
-            unique case (instr_rdata_i[31:25])
-              7'b0000000: begin // AND
-                alu_operator_o_mode  = tpr_i[LOGICAL_HIGH:LOGICAL_LOW];
-              end
-              7'b0000001: begin // REMU
-                alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
-              end
-              default: ;
-            endcase
-          end
-          default: ;
-        endcase
+        if(instr_rdata_i[31:25] == 7'b1111010) begin
+          register_set_o = 1'b1;
+        end else begin
+          unique case (instr_rdata_i[14:12])
+            3'b000: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000, 7'b0100000: begin // ADD, SUB
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                7'b0000001: begin // MUL
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b001: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000: begin // SLL
+                  alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
+                end
+                7'b0000001: begin // MULH
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b010: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000: begin // SLT
+                  alu_operator_o_mode  = tpr_i[COMPARISON_HIGH:COMPARISON_LOW];
+                end
+                7'b0000001: begin // MULHSU
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b011: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000: begin // SLTU
+                  alu_operator_o_mode  = tpr_i[COMPARISON_HIGH:COMPARISON_LOW];
+                end
+                7'b0000001: begin // MULHU
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b100: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000: begin // XOR
+                  alu_operator_o_mode  = tpr_i[LOGICAL_HIGH:LOGICAL_LOW];
+                end
+                7'b0000001: begin // DIV
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b101: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000, 7'b0100000: begin // SRL, SRA
+                  alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
+                end
+                7'b0000001: begin // DIVU
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b110: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000: begin // OR
+                  alu_operator_o_mode  = tpr_i[LOGICAL_HIGH:LOGICAL_LOW];
+                end
+                7'b0000001: begin // REM
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            3'b111: begin
+              unique case (instr_rdata_i[31:25])
+                7'b0000000: begin // AND
+                  alu_operator_o_mode  = tpr_i[LOGICAL_HIGH:LOGICAL_LOW];
+                end
+                7'b0000001: begin // REMU
+                  alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
+                end
+                default: ;
+              endcase
+            end
+            default: ;
+          endcase
+        end
       end
       default: ;
     endcase

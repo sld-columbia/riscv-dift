@@ -287,6 +287,8 @@ module riscv_core
   logic        data_wdata_ex_tag;
   logic        data_rdata_ex_tag;
   logic        register_set_tag;
+  logic [4:0]  regfile_alu_waddr_fw_tag;
+  logic [4:0]  regfile_alu_waddr_tag;
 `endif
 
   //////////////////////////////////////////////////////////////////////////////////////////////
@@ -577,6 +579,7 @@ module riscv_core
     .regfile_wdata_wb_i_tag       ( data_rdata_ex_tag        ),
     .regfile_alu_wdata_fw_i_tag   ( regfile_alu_wdata_fw_tag ),
     .regfile_alu_we_fw_i_tag      ( regfile_alu_we_fw_tag    ),
+    .regfile_alu_waddr_fw_i_tag   ( regfile_alu_waddr_fw_tag ),
     .tpr_i                        ( tpr                      ),
     .tcr_i                        ( tcr                      ),
     .pc_id_i_tag                  ( pc_id_tag                ),
@@ -593,7 +596,8 @@ module riscv_core
     .check_s1_o_tag               ( check_s1_tag             ),
     .check_s2_o_tag               ( check_s2_tag             ),
     .check_d_o_tag                ( check_d_tag              ),
-    .register_set_o_tag           ( register_set_tag         )
+    .register_set_o_tag           ( register_set_tag         ),
+    .regfile_alu_waddr_ex_o_tag   ( regfile_alu_waddr_tag    )
 `endif
   );
 
@@ -680,8 +684,10 @@ module riscv_core
     .check_s2_i_tag             ( check_s2_tag                 ),
     .check_d_i_tag              ( check_d_tag                  ),
     .register_set_i_tag         ( register_set_tag             ),
+    .regfile_alu_waddr_i_tag    ( regfile_alu_waddr_tag        ),
     .regfile_alu_wdata_fw_o_tag ( regfile_alu_wdata_fw_tag     ),
     .regfile_alu_we_fw_o_tag    ( regfile_alu_we_fw_tag        ),
+    .regfile_alu_waddr_fw_o_tag ( regfile_alu_waddr_fw_tag     ),
     .jump_target_o_tag          ( jump_target_ex_tag           ),
     .pc_enable_o_tag            ( pc_enable_tag                ),
     .data_wdata_ex_o_tag        ( data_wdata_ex_tag            ),

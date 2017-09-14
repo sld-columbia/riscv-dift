@@ -203,6 +203,7 @@ module riscv_id_stage
     input  logic        regfile_wdata_wb_i_tag,            // From WB stage
     input  logic        regfile_alu_wdata_fw_i_tag,        // From tags ALU (EX stage)
     input  logic        regfile_alu_we_fw_i_tag,           // From tags ALU (EX stage)
+    input  logic [4:0]  regfile_alu_waddr_fw_i_tag,        // From EX
     input  logic [31:0] tpr_i,                             // From CRS
     input  logic [31:0] tcr_i,                             // From CRS
     input  logic        pc_id_i_tag,                       // From IF
@@ -216,6 +217,7 @@ module riscv_id_stage
     output logic        alu_operand_a_ex_o_tag,            // To EX
     output logic        alu_operand_b_ex_o_tag,            // To EX
     output logic        alu_operand_c_ex_o_tag,            // To EX
+    output logic [4:0]  regfile_alu_waddr_ex_o_tag,        // To EX
     output logic        check_s1_o_tag,                    // To EX
     output logic        check_s2_o_tag,                    // To EX
     output logic        check_d_o_tag,                     // To EX
@@ -403,6 +405,7 @@ module riscv_id_stage
   logic        check_d_tag;
   logic        execute_pc_tag;
   logic        exception_tag;
+  logic        register_set_tag;
 `endif
 
   assign instr = instr_rdata_i;
@@ -910,7 +913,7 @@ module riscv_id_stage
     .we_a_i       ( regfile_enable_tag ),
 
     // Write port b
-    .waddr_b_i    ( regfile_alu_waddr_fw_i ),
+    .waddr_b_i    ( regfile_alu_waddr_fw_i_tag ),
     .wdata_b_i    ( regfile_alu_wdata_fw_i_tag ),
     .we_b_i       ( regfile_alu_we_fw_i_tag )
   );
@@ -1017,7 +1020,7 @@ module riscv_id_stage
 
     // jump/branches
     .alu_operator_o_mode             ( alu_operator_mode         ),
-    .register_set_o                  ( register_set_o_tag        )
+    .register_set_o                  ( register_set_tag        )
   );
 `endif
 
@@ -1505,6 +1508,8 @@ module riscv_id_stage
       check_s1_o_tag              <= '0;
       check_s2_o_tag              <= '0;
       check_d_o_tag               <= '0;
+      register_set_o_tag          <= '0;
+      regfile_alu_waddr_ex_o_tag  <= '0;
     end
     else if (data_misaligned_i) begin
       if (ex_ready_i)
@@ -1521,6 +1526,7 @@ module riscv_id_stage
           check_s1_o_tag                <= check_s1_tag;
           check_s2_o_tag                <= check_s2_tag;
           check_d_o_tag                 <= check_d_tag;
+          register_set_o_tag            <= register_set_tag;
           if (is_store) begin
             if (enable_a) begin
               alu_operand_a_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address tag
@@ -1538,6 +1544,11 @@ module riscv_id_stage
             alu_operand_c_ex_o_tag      <= alu_operand_c_tag;
           end
         end
+
+        if (regfile_alu_we_id || register_set_tag) begin
+          regfile_alu_waddr_ex_o_tag    <= regfile_alu_waddr_id;
+        end
+
         if ((jump_in_id == BRANCH_COND) || data_load_event_id) begin
           pc_ex_o_tag               <= pc_id_i_tag;
         end
