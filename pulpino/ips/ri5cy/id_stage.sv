@@ -218,7 +218,8 @@ module riscv_id_stage
     output logic        alu_operand_c_ex_o_tag,            // To EX
     output logic        check_s1_o_tag,                    // To EX
     output logic        check_s2_o_tag,                    // To EX
-    output logic        check_d_o_tag                      // To EX
+    output logic        check_d_o_tag,                     // To EX
+    output logic        register_set_o_tag                 // To EX
 `endif
 );
 
@@ -1015,7 +1016,8 @@ module riscv_id_stage
     .tpr_i                           ( tpr_i                     ),
 
     // jump/branches
-    .alu_operator_o_mode             ( alu_operator_mode            )
+    .alu_operator_o_mode             ( alu_operator_mode         ),
+    .register_set_o                  ( register_set_o_tag        )
   );
 `endif
 

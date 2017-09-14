@@ -105,6 +105,7 @@ module riscv_ex_stage
   input  logic        check_s1_i_tag,
   input  logic        check_s2_i_tag,
   input  logic        check_d_i_tag,
+  input  logic        register_set_i_tag,
   output logic        regfile_alu_wdata_fw_o_tag,
   output logic        regfile_alu_we_fw_o_tag,
   output logic        jump_target_o_tag,
@@ -144,8 +145,15 @@ module riscv_ex_stage
 
 `ifdef DIFT
   // Register instruction except Load
-  assign regfile_alu_wdata_fw_o_tag = alu_result_tag;
-  assign regfile_alu_we_fw_o_tag    = rf_enable_tag & regfile_alu_we_i;
+  always_comb begin
+    if (register_set_i_tag) begin
+      regfile_alu_wdata_fw_o_tag = 1'b1;
+      regfile_alu_we_fw_o_tag    = 1'b1;
+    end else begin
+      regfile_alu_wdata_fw_o_tag = alu_result_tag;
+      regfile_alu_we_fw_o_tag    = rf_enable_tag & regfile_alu_we_i;
+    end
+  end
 
   // Store
   assign data_wdata_ex_o_tag        = alu_result_tag;  // M[RS1+offset]: destination tag

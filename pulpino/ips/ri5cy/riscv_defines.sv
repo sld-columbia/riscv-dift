@@ -56,6 +56,7 @@ parameter OPCODE_STORE_POST = 7'h2b;
 parameter OPCODE_PULP_OP    = 7'h5b;
 parameter OPCODE_VECOP      = 7'h57;
 parameter OPCODE_HWLOOP     = 7'h7b;
+parameter OPCODE_SET        = 7'h1b;
 
 parameter REGC_S1   = 2'b10;
 parameter REGC_RD   = 2'b01;

@@ -22,12 +22,14 @@ module riscv_mode_tag
   input  logic [31:0] tpr_i,
 
   // ALU signals
-  output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode
+  output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode,
+  output logic                      register_set_o
 );
 
   always_comb
   begin
     alu_operator_o_mode          = ALU_MODE_OLD;
+    register_set_o               = 1'b0;
 
     unique case (instr_rdata_i[6:0])
 
@@ -100,9 +102,7 @@ module riscv_mode_tag
               7'b0000000: begin // SLLI
                 alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b010, 3'b011: begin  // SLTI, SLTIU
@@ -116,15 +116,17 @@ module riscv_mode_tag
               7'b0000000, 7'b0100000: begin // SRLI, SRAI
                 alu_operator_o_mode  = tpr_i[SHIFT_HIGH:SHIFT_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
-          default: begin
-            alu_operator_o_mode  = ALU_MODE_OLD;
-          end
+          default: ;
         endcase
+      end
+
+      OPCODE_SET: begin
+        if(instr[31:25] == 7'b1111010) begin
+          register_set_o = 1'b1;
+        end
       end
 
       OPCODE_OP: begin
@@ -137,9 +139,7 @@ module riscv_mode_tag
               7'b0000001: begin // MUL
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b001: begin
@@ -150,9 +150,7 @@ module riscv_mode_tag
               7'b0000001: begin // MULH
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b010: begin
@@ -163,9 +161,7 @@ module riscv_mode_tag
               7'b0000001: begin // MULHSU
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b011: begin
@@ -176,9 +172,7 @@ module riscv_mode_tag
               7'b0000001: begin // MULHU
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b100: begin
@@ -189,9 +183,7 @@ module riscv_mode_tag
               7'b0000001: begin // DIV
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b101: begin
@@ -202,9 +194,7 @@ module riscv_mode_tag
               7'b0000001: begin // DIVU
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b110: begin
@@ -215,9 +205,7 @@ module riscv_mode_tag
               7'b0000001: begin // REM
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
           3'b111: begin
@@ -228,19 +216,13 @@ module riscv_mode_tag
               7'b0000001: begin // REMU
                 alu_operator_o_mode  = tpr_i[INTEGER_HIGH:INTEGER_LOW];
               end
-              default: begin
-                alu_operator_o_mode  = ALU_MODE_OLD;
-              end
+              default: ;
             endcase
           end
-          default: begin
-            alu_operator_o_mode  = ALU_MODE_OLD;
-          end
+          default: ;
         endcase
       end
-      default: begin
-        alu_operator_o_mode  = ALU_MODE_OLD;
-      end
+      default: ;
     endcase
   end
 

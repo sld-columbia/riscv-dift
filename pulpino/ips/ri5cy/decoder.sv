@@ -432,173 +432,175 @@ module riscv_decoder
       end
 
       OPCODE_OP: begin  // Register-Register ALU operation
-        regfile_alu_we = 1'b1;
-        rega_used_o    = 1'b1;
+        if(instr[31:25] != 7'b1111010) begin
+          regfile_alu_we = 1'b1;
+          rega_used_o    = 1'b1;
 
-        if (instr_rdata_i[31]) begin
-          // bit-manipulation instructions
-          alu_op_b_mux_sel_o  = OP_B_IMM;
-          bmask_needed_o      = 1'b1;
-          bmask_a_mux_o       = BMASK_A_S3;
-          bmask_b_mux_o       = BMASK_B_S2;
+          if (instr_rdata_i[31]) begin
+            // bit-manipulation instructions
+            alu_op_b_mux_sel_o  = OP_B_IMM;
+            bmask_needed_o      = 1'b1;
+            bmask_a_mux_o       = BMASK_A_S3;
+            bmask_b_mux_o       = BMASK_B_S2;
 
-          unique case (instr_rdata_i[14:12])
-            3'b000: begin
-              alu_operator_o  = ALU_BEXT;
-              imm_b_mux_sel_o = IMMB_S2;
-              bmask_b_mux_o   = BMASK_B_ZERO;
-            end
-            3'b001: begin
-              alu_operator_o  = ALU_BEXTU;
-              imm_b_mux_sel_o = IMMB_S2;
-              bmask_b_mux_o   = BMASK_B_ZERO;
-            end
+            unique case (instr_rdata_i[14:12])
+              3'b000: begin
+                alu_operator_o  = ALU_BEXT;
+                imm_b_mux_sel_o = IMMB_S2;
+                bmask_b_mux_o   = BMASK_B_ZERO;
+              end
+              3'b001: begin
+                alu_operator_o  = ALU_BEXTU;
+                imm_b_mux_sel_o = IMMB_S2;
+                bmask_b_mux_o   = BMASK_B_ZERO;
+              end
 
-            3'b010: begin
-              alu_operator_o      = ALU_BINS;
-              imm_b_mux_sel_o     = IMMB_S2;
-              regc_used_o         = 1'b1;
-              regc_mux_o          = REGC_RD;
-            end
+              3'b010: begin
+                alu_operator_o      = ALU_BINS;
+                imm_b_mux_sel_o     = IMMB_S2;
+                regc_used_o         = 1'b1;
+                regc_mux_o          = REGC_RD;
+              end
 
-            3'b011: begin alu_operator_o = ALU_BCLR; end
-            3'b100: begin alu_operator_o = ALU_BSET; end
+              3'b011: begin alu_operator_o = ALU_BCLR; end
+              3'b100: begin alu_operator_o = ALU_BSET; end
 
-            default: illegal_insn_o = 1'b1;
-          endcase
-        end
-        else
-        begin // non bit-manipulation instructions
+              default: illegal_insn_o = 1'b1;
+            endcase
+          end
+          else
+          begin // non bit-manipulation instructions
 
-          if (~instr_rdata_i[28])
-            regb_used_o = 1'b1;
+            if (~instr_rdata_i[28])
+              regb_used_o = 1'b1;
 
-          unique case ({instr_rdata_i[30:25], instr_rdata_i[14:12]})
-            // RV32I ALU operations
-            {6'b00_0000, 3'b000}: alu_operator_o = ALU_ADD;   // Add
-            {6'b10_0000, 3'b000}: alu_operator_o = ALU_SUB;   // Sub
-            {6'b00_0000, 3'b010}: alu_operator_o = ALU_SLTS;  // Set Lower Than
-            {6'b00_0000, 3'b011}: alu_operator_o = ALU_SLTU;  // Set Lower Than Unsigned
-            {6'b00_0000, 3'b100}: alu_operator_o = ALU_XOR;   // Xor
-            {6'b00_0000, 3'b110}: alu_operator_o = ALU_OR;    // Or
-            {6'b00_0000, 3'b111}: alu_operator_o = ALU_AND;   // And
-            {6'b00_0000, 3'b001}: alu_operator_o = ALU_SLL;   // Shift Left Logical
-            {6'b00_0000, 3'b101}: alu_operator_o = ALU_SRL;   // Shift Right Logical
-            {6'b10_0000, 3'b101}: alu_operator_o = ALU_SRA;   // Shift Right Arithmetic
+            unique case ({instr_rdata_i[30:25], instr_rdata_i[14:12]})
+              // RV32I ALU operations
+              {6'b00_0000, 3'b000}: alu_operator_o = ALU_ADD;   // Add
+              {6'b10_0000, 3'b000}: alu_operator_o = ALU_SUB;   // Sub
+              {6'b00_0000, 3'b010}: alu_operator_o = ALU_SLTS;  // Set Lower Than
+              {6'b00_0000, 3'b011}: alu_operator_o = ALU_SLTU;  // Set Lower Than Unsigned
+              {6'b00_0000, 3'b100}: alu_operator_o = ALU_XOR;   // Xor
+              {6'b00_0000, 3'b110}: alu_operator_o = ALU_OR;    // Or
+              {6'b00_0000, 3'b111}: alu_operator_o = ALU_AND;   // And
+              {6'b00_0000, 3'b001}: alu_operator_o = ALU_SLL;   // Shift Left Logical
+              {6'b00_0000, 3'b101}: alu_operator_o = ALU_SRL;   // Shift Right Logical
+              {6'b10_0000, 3'b101}: alu_operator_o = ALU_SRA;   // Shift Right Arithmetic
 
-            // supported RV32M instructions
-            {6'b00_0001, 3'b000}: begin // mul
-              mult_int_en_o   = 1'b1;
-              mult_operator_o = MUL_MAC32;
-              regc_mux_o      = REGC_ZERO;
-            end
-            {6'b00_0001, 3'b001}: begin // mulh
-              regc_used_o        = 1'b1;
-              regc_mux_o         = REGC_ZERO;
-              mult_signed_mode_o = 2'b11;
-              mult_int_en_o      = 1'b1;
-              mult_operator_o    = MUL_H;
-            end
-            {6'b00_0001, 3'b010}: begin // mulhsu
-              regc_used_o        = 1'b1;
-              regc_mux_o         = REGC_ZERO;
-              mult_signed_mode_o = 2'b01;
-              mult_int_en_o      = 1'b1;
-              mult_operator_o    = MUL_H;
-            end
-            {6'b00_0001, 3'b011}: begin // mulhu
-              regc_used_o        = 1'b1;
-              regc_mux_o         = REGC_ZERO;
-              mult_signed_mode_o = 2'b00;
-              mult_int_en_o      = 1'b1;
-              mult_operator_o    = MUL_H;
-            end
-            {6'b00_0001, 3'b100}: begin // div
-              alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
-              alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
-              regc_mux_o         = REGC_S1;
-              regc_used_o        = 1'b1;
-              regb_used_o        = 1'b1;
-              rega_used_o        = 1'b0;
-              alu_operator_o     = ALU_DIV;
-            end
-            {6'b00_0001, 3'b101}: begin // divu
-              alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
-              alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
-              regc_mux_o         = REGC_S1;
-              regc_used_o        = 1'b1;
-              regb_used_o        = 1'b1;
-              rega_used_o        = 1'b0;
-              alu_operator_o = ALU_DIVU;
-            end
-            {6'b00_0001, 3'b110}: begin // rem
-              alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
-              alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
-              regc_mux_o         = REGC_S1;
-              regc_used_o        = 1'b1;
-              regb_used_o        = 1'b1;
-              rega_used_o        = 1'b0;
-              alu_operator_o = ALU_REM;
-            end
-            {6'b00_0001, 3'b111}: begin // remu
-              alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
-              alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
-              regc_mux_o         = REGC_S1;
-              regc_used_o        = 1'b1;
-              regb_used_o        = 1'b1;
-              rega_used_o        = 1'b0;
-              alu_operator_o = ALU_REMU;
-            end
+              // supported RV32M instructions
+              {6'b00_0001, 3'b000}: begin // mul
+                mult_int_en_o   = 1'b1;
+                mult_operator_o = MUL_MAC32;
+                regc_mux_o      = REGC_ZERO;
+              end
+              {6'b00_0001, 3'b001}: begin // mulh
+                regc_used_o        = 1'b1;
+                regc_mux_o         = REGC_ZERO;
+                mult_signed_mode_o = 2'b11;
+                mult_int_en_o      = 1'b1;
+                mult_operator_o    = MUL_H;
+              end
+              {6'b00_0001, 3'b010}: begin // mulhsu
+                regc_used_o        = 1'b1;
+                regc_mux_o         = REGC_ZERO;
+                mult_signed_mode_o = 2'b01;
+                mult_int_en_o      = 1'b1;
+                mult_operator_o    = MUL_H;
+              end
+              {6'b00_0001, 3'b011}: begin // mulhu
+                regc_used_o        = 1'b1;
+                regc_mux_o         = REGC_ZERO;
+                mult_signed_mode_o = 2'b00;
+                mult_int_en_o      = 1'b1;
+                mult_operator_o    = MUL_H;
+              end
+              {6'b00_0001, 3'b100}: begin // div
+                alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
+                alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
+                regc_mux_o         = REGC_S1;
+                regc_used_o        = 1'b1;
+                regb_used_o        = 1'b1;
+                rega_used_o        = 1'b0;
+                alu_operator_o     = ALU_DIV;
+              end
+              {6'b00_0001, 3'b101}: begin // divu
+                alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
+                alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
+                regc_mux_o         = REGC_S1;
+                regc_used_o        = 1'b1;
+                regb_used_o        = 1'b1;
+                rega_used_o        = 1'b0;
+                alu_operator_o = ALU_DIVU;
+              end
+              {6'b00_0001, 3'b110}: begin // rem
+                alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
+                alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
+                regc_mux_o         = REGC_S1;
+                regc_used_o        = 1'b1;
+                regb_used_o        = 1'b1;
+                rega_used_o        = 1'b0;
+                alu_operator_o = ALU_REM;
+              end
+              {6'b00_0001, 3'b111}: begin // remu
+                alu_op_a_mux_sel_o = OP_A_REGB_OR_FWD;
+                alu_op_b_mux_sel_o = OP_B_REGC_OR_FWD;
+                regc_mux_o         = REGC_S1;
+                regc_used_o        = 1'b1;
+                regb_used_o        = 1'b1;
+                rega_used_o        = 1'b0;
+                alu_operator_o = ALU_REMU;
+              end
 
-            // PULP specific instructions
-            {6'b10_0001, 3'b000}: begin // p.mac
-              regc_used_o     = 1'b1;
-              regc_mux_o      = REGC_RD;
-              mult_int_en_o   = 1'b1;
-              mult_operator_o = MUL_MAC32;
-            end
-            {6'b10_0001, 3'b001}: begin // p.msu
-              regc_used_o     = 1'b1;
-              regc_mux_o      = REGC_RD;
-              mult_int_en_o   = 1'b1;
-              mult_operator_o = MUL_MSU32;
-            end
+              // PULP specific instructions
+              {6'b10_0001, 3'b000}: begin // p.mac
+                regc_used_o     = 1'b1;
+                regc_mux_o      = REGC_RD;
+                mult_int_en_o   = 1'b1;
+                mult_operator_o = MUL_MAC32;
+              end
+              {6'b10_0001, 3'b001}: begin // p.msu
+                regc_used_o     = 1'b1;
+                regc_mux_o      = REGC_RD;
+                mult_int_en_o   = 1'b1;
+                mult_operator_o = MUL_MSU32;
+              end
 
-            {6'b00_0010, 3'b010}: alu_operator_o = ALU_SLETS; // Set Lower Equal Than
-            {6'b00_0010, 3'b011}: alu_operator_o = ALU_SLETU; // Set Lower Equal Than Unsigned
-            {6'b00_0010, 3'b100}: alu_operator_o = ALU_MIN;   // Min
-            {6'b00_0010, 3'b101}: alu_operator_o = ALU_MINU;  // Min Unsigned
-            {6'b00_0010, 3'b110}: alu_operator_o = ALU_MAX;   // Max
-            {6'b00_0010, 3'b111}: alu_operator_o = ALU_MAXU;  // Max Unsigned
+              {6'b00_0010, 3'b010}: alu_operator_o = ALU_SLETS; // Set Lower Equal Than
+              {6'b00_0010, 3'b011}: alu_operator_o = ALU_SLETU; // Set Lower Equal Than Unsigned
+              {6'b00_0010, 3'b100}: alu_operator_o = ALU_MIN;   // Min
+              {6'b00_0010, 3'b101}: alu_operator_o = ALU_MINU;  // Min Unsigned
+              {6'b00_0010, 3'b110}: alu_operator_o = ALU_MAX;   // Max
+              {6'b00_0010, 3'b111}: alu_operator_o = ALU_MAXU;  // Max Unsigned
 
-            {6'b00_0100, 3'b101}: alu_operator_o = ALU_ROR;   // Rotate Right
+              {6'b00_0100, 3'b101}: alu_operator_o = ALU_ROR;   // Rotate Right
 
-            // PULP specific instructions using only one source register
-            {6'b00_1000, 3'b000}: alu_operator_o = ALU_FF1;   // Find First 1
-            {6'b00_1000, 3'b001}: alu_operator_o = ALU_FL1;   // Find Last 1
-            {6'b00_1000, 3'b010}: alu_operator_o = ALU_CLB;   // Count Leading Bits
-            {6'b00_1000, 3'b011}: alu_operator_o = ALU_CNT;   // Count set bits (popcount)
-            {6'b00_1000, 3'b100}: begin alu_operator_o = ALU_EXTS; alu_vec_mode_o = VEC_MODE16; end // Sign-extend Half-word
-            {6'b00_1000, 3'b101}: begin alu_operator_o = ALU_EXT;  alu_vec_mode_o = VEC_MODE16; end // Zero-extend Half-word
-            {6'b00_1000, 3'b110}: begin alu_operator_o = ALU_EXTS; alu_vec_mode_o = VEC_MODE8;  end // Sign-extend Byte
-            {6'b00_1000, 3'b111}: begin alu_operator_o = ALU_EXT;  alu_vec_mode_o = VEC_MODE8;  end // Zero-extend Byte
+              // PULP specific instructions using only one source register
+              {6'b00_1000, 3'b000}: alu_operator_o = ALU_FF1;   // Find First 1
+              {6'b00_1000, 3'b001}: alu_operator_o = ALU_FL1;   // Find Last 1
+              {6'b00_1000, 3'b010}: alu_operator_o = ALU_CLB;   // Count Leading Bits
+              {6'b00_1000, 3'b011}: alu_operator_o = ALU_CNT;   // Count set bits (popcount)
+              {6'b00_1000, 3'b100}: begin alu_operator_o = ALU_EXTS; alu_vec_mode_o = VEC_MODE16; end // Sign-extend Half-word
+              {6'b00_1000, 3'b101}: begin alu_operator_o = ALU_EXT;  alu_vec_mode_o = VEC_MODE16; end // Zero-extend Half-word
+              {6'b00_1000, 3'b110}: begin alu_operator_o = ALU_EXTS; alu_vec_mode_o = VEC_MODE8;  end // Sign-extend Byte
+              {6'b00_1000, 3'b111}: begin alu_operator_o = ALU_EXT;  alu_vec_mode_o = VEC_MODE8;  end // Zero-extend Byte
 
-            {6'b00_0010, 3'b000}: alu_operator_o = ALU_ABS;   // p.abs
+              {6'b00_0010, 3'b000}: alu_operator_o = ALU_ABS;   // p.abs
 
-            {6'b00_1010, 3'b001}: begin // p.clip
-              alu_operator_o     = ALU_CLIP;
-              alu_op_b_mux_sel_o = OP_A_IMM;
-              imm_b_mux_sel_o    = IMMB_CLIP;
-            end
+              {6'b00_1010, 3'b001}: begin // p.clip
+                alu_operator_o     = ALU_CLIP;
+                alu_op_b_mux_sel_o = OP_A_IMM;
+                imm_b_mux_sel_o    = IMMB_CLIP;
+              end
 
-            {6'b00_1010, 3'b010}: begin // p.clipu
-              alu_operator_o     = ALU_CLIPU;
-              alu_op_b_mux_sel_o = OP_A_IMM;
-              imm_b_mux_sel_o    = IMMB_CLIP;
-            end
+              {6'b00_1010, 3'b010}: begin // p.clipu
+                alu_operator_o     = ALU_CLIPU;
+                alu_op_b_mux_sel_o = OP_A_IMM;
+                imm_b_mux_sel_o    = IMMB_CLIP;
+              end
 
-            default: begin
-              illegal_insn_o = 1'b1;
+              default: begin
+                illegal_insn_o = 1'b1;
+              end
             end
           endcase
         end
@@ -817,7 +819,6 @@ module riscv_decoder
           default: illegal_insn_o = 1'b1;
         endcase
       end
-
 
       ////////////////////////////////////////////////
       //  ____  ____  _____ ____ ___    _    _      //
