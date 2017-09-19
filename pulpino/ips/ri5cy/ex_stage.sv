@@ -106,6 +106,7 @@ module riscv_ex_stage
   input  logic        check_s2_i_tag,
   input  logic        check_d_i_tag,
   input  logic        register_set_i_tag,
+  input  logic        memory_set_i_tag,
   input  logic [4:0]  regfile_alu_waddr_i_tag,
   output logic        regfile_alu_wdata_fw_o_tag,
   output logic        regfile_alu_we_fw_o_tag,
@@ -159,8 +160,15 @@ module riscv_ex_stage
   assign regfile_alu_waddr_fw_o_tag = regfile_alu_waddr_i_tag;
 
   // Store
-  assign data_wdata_ex_o_tag        = alu_result_tag;  // M[RS1+offset]: destination tag
-  assign data_we_ex_o_tag           = data_we_ex_i & rf_enable_tag;
+  always_comb begin
+    if (memory_set_i_tag) begin
+      data_wdata_ex_o_tag        = 1'b1;  // M[RS1+offset]: destination tag
+      data_we_ex_o_tag           = 1'b1;
+    end else begin
+      data_wdata_ex_o_tag        = alu_result_tag;  // M[RS1+offset]: destination tag
+      data_we_ex_o_tag           = data_we_ex_i & rf_enable_tag;
+    end
+  end
 
   // Branch
   // if (branch is not taken)

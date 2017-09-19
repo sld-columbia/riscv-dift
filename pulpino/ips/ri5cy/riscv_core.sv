@@ -597,6 +597,7 @@ module riscv_core
     .check_s2_o_tag               ( check_s2_tag             ),
     .check_d_o_tag                ( check_d_tag              ),
     .register_set_o_tag           ( register_set_tag         ),
+    .memory_set_o_tag             ( memory_set_tag           ),
     .regfile_alu_waddr_ex_o_tag   ( regfile_alu_waddr_tag    )
 `endif
   );
@@ -684,6 +685,7 @@ module riscv_core
     .check_s2_i_tag             ( check_s2_tag                 ),
     .check_d_i_tag              ( check_d_tag                  ),
     .register_set_i_tag         ( register_set_tag             ),
+    .memory_set_i_tag           ( memory_set_tag               ),
     .regfile_alu_waddr_i_tag    ( regfile_alu_waddr_tag        ),
     .regfile_alu_wdata_fw_o_tag ( regfile_alu_wdata_fw_tag     ),
     .regfile_alu_we_fw_o_tag    ( regfile_alu_we_fw_tag        ),
