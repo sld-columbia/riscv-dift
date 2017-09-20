@@ -23,6 +23,10 @@ int main(int argc, char* argv[])
     argv = dummy_args;
     argc = sizeof(dummy_args)/sizeof(dummy_args[0])-1;    
 
+    asm volatile ("p.spsw x0, 0(%[argv]);"                
+		  :
+                  :[argv] "r" (&argv[1]));
+
     if(a)
       echo(argv[1]);
     else
