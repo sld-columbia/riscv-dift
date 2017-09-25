@@ -306,6 +306,9 @@ module riscv_controller
             if (exc_req_i) begin
               pc_mux_o      = PC_EXCEPTION;
               pc_set_o      = 1'b1;
+`ifdef DIFT
+              pc_set_o_tag  = 1'b1;
+`endif
               exc_ack_o     = 1'b1;
 
               halt_id_o     = 1'b1; // we don't want to propagate this instruction to EX

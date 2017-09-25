@@ -171,7 +171,7 @@ module riscv_if_stage
       PC_BOOT:      fetch_addr_n_tag = 1'b0;
       PC_JUMP:      fetch_addr_n_tag = jump_target_id_i_tag;
       PC_BRANCH:    fetch_addr_n_tag = jump_target_ex_i_tag;
-      default:;
+      default:      fetch_addr_n_tag = 1'b0;
     endcase
   end
 `endif
