@@ -80,7 +80,7 @@ module riscv_check_tag
       //////////////////////////////////
 
       OPCODE_STORE,
-      //OPCODE_STORE_POST,
+      OPCODE_STORE_POST,
       OPCODE_LUI,
       OPCODE_AUIPC
       : begin

@@ -107,6 +107,7 @@ module riscv_ex_stage
   input  logic        check_d_i_tag,
   input  logic        register_set_i_tag,
   input  logic        memory_set_i_tag,
+  input  logic        is_store_post_i_tag,
   input  logic [4:0]  regfile_alu_waddr_i_tag,
   output logic        regfile_alu_wdata_fw_o_tag,
   output logic        regfile_alu_we_fw_o_tag,
@@ -154,7 +155,7 @@ module riscv_ex_stage
       regfile_alu_we_fw_o_tag    = 1'b1;
     end else begin
       regfile_alu_wdata_fw_o_tag = alu_result_tag;
-      regfile_alu_we_fw_o_tag    = rf_enable_tag & regfile_alu_we_i;
+      regfile_alu_we_fw_o_tag    = rf_enable_tag & regfile_alu_we_i & ~(is_store_post_i_tag);
     end
   end
   assign regfile_alu_waddr_fw_o_tag = regfile_alu_waddr_i_tag;

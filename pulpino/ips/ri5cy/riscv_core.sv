@@ -287,6 +287,7 @@ module riscv_core
   logic        data_wdata_ex_tag;
   logic        data_rdata_ex_tag;
   logic        register_set_tag;
+  logic        is_store_post_tag;
   logic [4:0]  regfile_alu_waddr_fw_tag;
   logic [4:0]  regfile_alu_waddr_tag;
 `endif
@@ -597,6 +598,7 @@ module riscv_core
     .check_s2_o_tag               ( check_s2_tag             ),
     .check_d_o_tag                ( check_d_tag              ),
     .register_set_o_tag           ( register_set_tag         ),
+    .is_store_post_o_tag          ( is_store_post_tag        ),
     .memory_set_o_tag             ( memory_set_tag           ),
     .regfile_alu_waddr_ex_o_tag   ( regfile_alu_waddr_tag    )
 `endif
@@ -685,6 +687,7 @@ module riscv_core
     .check_s2_i_tag             ( check_s2_tag                 ),
     .check_d_i_tag              ( check_d_tag                  ),
     .register_set_i_tag         ( register_set_tag             ),
+    .is_store_post_i_tag          ( is_store_post_tag        ),
     .memory_set_i_tag           ( memory_set_tag               ),
     .regfile_alu_waddr_i_tag    ( regfile_alu_waddr_tag        ),
     .regfile_alu_wdata_fw_o_tag ( regfile_alu_wdata_fw_tag     ),

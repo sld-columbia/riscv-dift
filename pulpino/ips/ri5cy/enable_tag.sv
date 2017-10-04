@@ -35,8 +35,8 @@ module riscv_enable_tag
 
     unique case (instr_rdata_i[6:0])
 
-      OPCODE_STORE
-      //OPCODE_STORE_POST,
+      OPCODE_STORE,
+      OPCODE_STORE_POST
       : begin
         enable_a_o  = tpr_i[LOADSTORE_EN_DEST_ADDR];
         enable_b_o  = tpr_i[LOADSTORE_EN_SOURCE];

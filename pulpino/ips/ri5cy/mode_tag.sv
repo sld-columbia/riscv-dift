@@ -24,6 +24,7 @@ module riscv_mode_tag
   // ALU signals
   output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode,
   output logic                      register_set_o,
+  output logic                      is_store_post_o,
   output logic                      memory_set_o
 );
 
@@ -32,6 +33,7 @@ module riscv_mode_tag
     alu_operator_o_mode          = ALU_MODE_OLD;
     register_set_o               = 1'b0;
     memory_set_o                 = 1'b0;
+    is_store_post_o              = 1'b0;
 
     unique case (instr_rdata_i[6:0])
 
@@ -71,16 +73,25 @@ module riscv_mode_tag
       //                              //
       //////////////////////////////////
 
-      OPCODE_STORE,
-      //OPCODE_STORE_POST,
-      OPCODE_LUI,
-      OPCODE_AUIPC
+      OPCODE_STORE
       : begin
         if(instr_rdata_i[14:12] == 3'b111) begin
           memory_set_o = 1'b1;
         end else begin
           alu_operator_o_mode  = tpr_i[LOADSTORE_HIGH:LOADSTORE_LOW];
         end
+      end
+
+      OPCODE_STORE_POST
+      : begin
+        alu_operator_o_mode  = tpr_i[LOADSTORE_HIGH:LOADSTORE_LOW];
+        is_store_post_o      = 1'b1;
+      end
+
+      OPCODE_LUI,
+      OPCODE_AUIPC
+      : begin
+        alu_operator_o_mode  = tpr_i[LOADSTORE_HIGH:LOADSTORE_LOW];
       end
 
       OPCODE_LOAD
