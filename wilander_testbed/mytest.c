@@ -70,6 +70,13 @@ void parameter_func_pointer(int choice, void (*stack_function_pointer)()) {
     memset(overflow_buffer, 'A', overflow);
     overflow_buffer[overflow/4] = (long)&shellcode;
 
+    /* TAG INITIALIZATION */
+    for(int j=0; j<=overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
+
     /* Then overflow stack_buffer with overflow_buffer  */
     memcpy(stack_buffer, overflow_buffer, overflow+4);
 
@@ -84,6 +91,13 @@ void parameter_func_pointer(int choice, void (*stack_function_pointer)()) {
     overflow_buffer[0] = (long)&shellcode;
     memset(overflow_buffer+1, 'A', overflow-8);
     overflow_buffer[overflow/4-1] = (long)(&stack_function_pointer);
+
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
 
     /* Then overflow stack_buffer with overflow_buffer */
     memcpy(stack_buffer, overflow_buffer, overflow);
@@ -126,6 +140,7 @@ void vuln_stack_return_addr(int choice) { /* Attack forms 1(a) and 3(a) */
     memset(overflow_buffer, 'A', overflow-4);
     overflow_buffer[overflow/4-1] = (long)&shellcode;
 
+    /* TAG INITIALIZATION */
     for(int j=0; j<overflow/4; j++) {
       asm volatile ("p.spsw x0, 0(%[ovf]);"                
                     :
@@ -143,6 +158,13 @@ void vuln_stack_return_addr(int choice) { /* Attack forms 1(a) and 3(a) */
     overflow_buffer[0] = (long)&shellcode;
     memset(overflow_buffer+1, 'A', overflow-8);
     overflow_buffer[overflow/4-1] = (long)(i-4);
+
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
 
     /* Then overflow stack_buffer with overflow_buffer */
     memcpy(stack_buffer, overflow_buffer, overflow);
@@ -183,6 +205,13 @@ void vuln_stack_base_ptr(int choice) { /* Attack forms 1(b) and 3(b) */
     memset(overflow_buffer+2, 'A', overflow-4);
     overflow_buffer[overflow/4-1] = (long)&stack_buffer[0];
 
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
+
     /* Then overflow stack_buffer with overflow_buffer */
     memcpy(stack_buffer, overflow_buffer, overflow);
   }
@@ -202,6 +231,13 @@ void vuln_stack_base_ptr(int choice) { /* Attack forms 1(b) and 3(b) */
     memset(overflow_buffer+3, 'A', overflow-4*(3+1));
     /* Old base pointer */
     overflow_buffer[overflow/4-1] = (long)(&choice-1-(base_pointer_offset/4));
+
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
 
     /* Then overflow stack_buffer with overflow_buffer  */
     /* Now stack_pointer points to the old base pointer */
@@ -232,6 +268,13 @@ void vuln_stack_function_ptr(int choice) { /* Attack forms 1(c) and 3(c) */
     memset(overflow_buffer, 'A', overflow);
     overflow_buffer[overflow/4] = (long)&shellcode;
 
+    /* TAG INITIALIZATION */
+    for(int j=0; j<=overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
+
     /* Then overflow stack_buffer with overflow_buffer  */
     memcpy(stack_buffer, overflow_buffer, overflow+4);
 
@@ -247,6 +290,13 @@ void vuln_stack_function_ptr(int choice) { /* Attack forms 1(c) and 3(c) */
     overflow_buffer[0] = (long)&shellcode;
     memset(overflow_buffer+1, 'A', overflow-8);
     overflow_buffer[overflow/4-1] = (long)(&stack_function_pointer);
+
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
 
     /* Then overflow stack_buffer with overflow_buffer */
     memcpy(stack_buffer, overflow_buffer, overflow);
@@ -284,6 +334,13 @@ void vuln_bss_return_addr(int choice) { /* Attack form 4(a)*/
     overflow_buffer[0] = (long)&shellcode;
     memset(overflow_buffer+1, 'A', overflow-8);
     overflow_buffer[overflow/4-1] = (long)(i-4);
+
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
 
     /* Then overflow bss_buffer with overflow_buffer */
     memcpy(bss_buffer, overflow_buffer, overflow);
@@ -324,6 +381,13 @@ void vuln_bss_base_ptr(int choice) { /* Attack form 4(b)*/
     /* Old base pointer */
     overflow_buffer[overflow/4-1] = (long)(i-4-(base_pointer_offset/4)*4);
 
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
+
     /* Then overflow bss_buffer with overflow_buffer  */
     /* Now bss_pointer points to the old base pointer */
     memcpy(bss_buffer, overflow_buffer, overflow);
@@ -354,6 +418,13 @@ void vuln_bss_function_ptr(int choice) { /* Attack forms 2(a) and 4(c) */
     memset(overflow_buffer, 'A', overflow);
     overflow_buffer[overflow/4] = (long)&shellcode;
 
+    /* TAG INITIALIZATION */
+    for(int j=0; j<=overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
+
     /* Then overflow bss_buffer with overflow_buffer  */
     memcpy(bss_buffer, overflow_buffer, overflow+4);
 
@@ -369,6 +440,13 @@ void vuln_bss_function_ptr(int choice) { /* Attack forms 2(a) and 4(c) */
     overflow_buffer[0] = (long)&shellcode;
     memset(overflow_buffer+1, 'A', overflow-8);
     overflow_buffer[overflow/4-1] = (long)(&bss_function_pointer);
+
+    /* TAG INITIALIZATION */
+    for(int j=0; j<overflow/4; j++) {
+      asm volatile ("p.spsw x0, 0(%[ovf]);"                
+                    :
+                    :[ovf] "r" (overflow_buffer+j));
+    }
 
     /* Then overflow bss_buffer with overflow_buffer */
     memcpy(bss_buffer, overflow_buffer, overflow);
