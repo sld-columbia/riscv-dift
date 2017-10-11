@@ -16,6 +16,8 @@
 #define PAD_RIGHT 1
 #define PAD_ZERO  2
 
+#define DATA_RAM_MASK 0x00FFFFFF
+
 /* the following should be enough for 32 bit int */
 #define PRINT_BUF_LEN 32
 
@@ -153,7 +155,10 @@ static int qprinti(char **out, int i, int b, int sg, int width, int pad, char le
 
 static void memprint(int nbytes, int *location)
 {
-  *location = nbytes;
+  int *address;
+
+  address = (int *)((int)location & DATA_RAM_MASK);
+  *address = nbytes;
 
   return;
 }
@@ -162,6 +167,7 @@ static int qprint(char **out, const char *format, va_list va)
 {
   register int width, pad;
   register int pc = 0;
+  int i;
   char scr[2];
 
   for (; *format != 0; ++format)
@@ -186,6 +192,23 @@ static int qprint(char **out, const char *format, va_list va)
         width *= 10;
         width += *format - '0';
       }
+      if( *format == '$' ) {
+        for(i = 1; i < width; i++) {
+          va_arg(va, int*);
+        }
+        ++format;
+        width = 0;
+        pad = 0;
+        while (*format == '0')
+        {
+          ++format;
+          pad |= PAD_ZERO;
+        }
+        for ( ; *format >= '0' && *format <= '9'; ++format) {
+          width *= 10;
+          width += *format - '0';
+        }
+      }
       if( *format == 's' ) {
         register char *s = va_arg(va, char*);
         pc += qprints (out, s?s:"(null)", width, pad);
@@ -208,7 +231,8 @@ static int qprint(char **out, const char *format, va_list va)
         continue;
       }
       if( *format == 'n' ) {
-        memprint (pc, va_arg(va, int));
+        memprint (pc, va_arg(va, int*));
+        continue;
       }
       if( *format == 'c' ) {
         scr[0] = va_arg(va, int);
