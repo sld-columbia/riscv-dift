@@ -109,6 +109,9 @@ module riscv_ex_stage
   input  logic        memory_set_i_tag,
   input  logic        is_store_post_i_tag,
   input  logic [4:0]  regfile_alu_waddr_i_tag,
+  input  logic        store_dest_addr_i_tag,
+  input  logic        store_source_i_tag,
+  input  logic        use_store_ops_i,
   output logic        regfile_alu_wdata_fw_o_tag,
   output logic        regfile_alu_we_fw_o_tag,
   output logic [4:0]  regfile_alu_waddr_fw_o_tag,
@@ -133,6 +136,8 @@ module riscv_ex_stage
   logic        alu_result_tag;
   logic        rf_enable_tag;
   logic        pc_enable_tag;
+  logic        check_a;
+  logic        check_b;
 `endif
 
   // EX stage result mux (ALU, MAC unit, CSR)
@@ -248,10 +253,13 @@ module riscv_ex_stage
 `endif
 
 `ifdef DIFT
+  assign check_a = use_store_ops_i ? store_dest_addr_i_tag : alu_operand_a_i_tag;
+  assign check_b = use_store_ops_i ? store_source_i_tag : alu_operand_b_i_tag;
+
   riscv_tag_check_logic tag_check_logic_i
   (
-    .operand_a_i          ( alu_operand_a_i_tag     ),
-    .operand_b_i          ( alu_operand_b_i_tag     ),
+    .operand_a_i          ( check_a                 ),
+    .operand_b_i          ( check_b                 ),
     .result_i             ( alu_result_tag          ),
     .check_s1_i           ( check_s1_i_tag          ),
     .check_s2_i           ( check_s2_i_tag          ),

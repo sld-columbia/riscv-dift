@@ -214,6 +214,9 @@ module riscv_id_stage
     output logic        pc_ex_o_tag,                       // To CSR (?)
     output logic        pc_set_o_tag,                      // To IF
     output logic [ALU_MODE_WIDTH-1:0] alu_operator_o_mode, // To EX
+    output logic        store_dest_addr_ex_o_tag,          // To EX
+    output logic        store_source_ex_o_tag,             // To EX
+    output logic        use_store_ops_ex_o,                // To EX
     output logic        alu_operand_a_ex_o_tag,            // To EX
     output logic        alu_operand_b_ex_o_tag,            // To EX
     output logic        alu_operand_c_ex_o_tag,            // To EX
@@ -1518,6 +1521,9 @@ module riscv_id_stage
       is_store_post_o_tag         <= '0;
       memory_set_o_tag            <= '0;
       regfile_alu_waddr_ex_o_tag  <= '0;
+      store_dest_addr_ex_o_tag    <= '0;
+      store_source_ex_o_tag       <= '0;
+      use_store_ops_ex_o          <= '0;
     end
     else if (data_misaligned_i) begin
       if (ex_ready_i)
@@ -1548,10 +1554,16 @@ module riscv_id_stage
             end else begin
               alu_operand_b_ex_o_tag    <= '0;
             end
+            store_dest_addr_ex_o_tag    <= alu_operand_a_tag;  // RS1: destination address tag
+            store_source_ex_o_tag       <= alu_operand_c_tag;  // RS2: source tag
+            use_store_ops_ex_o          <= '1;
           end else begin
             alu_operand_a_ex_o_tag      <= alu_operand_a_tag;
             alu_operand_b_ex_o_tag      <= alu_operand_b_tag;
             alu_operand_c_ex_o_tag      <= alu_operand_c_tag;
+            store_dest_addr_ex_o_tag    <= '0;
+            store_source_ex_o_tag       <= '0;
+            use_store_ops_ex_o          <= '0;
           end
         end
 

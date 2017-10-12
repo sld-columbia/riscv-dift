@@ -233,7 +233,7 @@ void vuln_stack_base_ptr(int choice) { /* Attack forms 1(b) and 3(b) */
     overflow_buffer[overflow/4-1] = (long)(&choice-1-(base_pointer_offset/4));
 
     /* TAG INITIALIZATION */
-    for(int j=0; j<overflow/4; j++) {
+    for(int j=0; j<overflow/4-1; j++) {
       asm volatile ("p.spsw x0, 0(%[ovf]);"                
                     :
                     :[ovf] "r" (overflow_buffer+j));
@@ -382,7 +382,7 @@ void vuln_bss_base_ptr(int choice) { /* Attack form 4(b)*/
     overflow_buffer[overflow/4-1] = (long)(i-4-(base_pointer_offset/4)*4);
 
     /* TAG INITIALIZATION */
-    for(int j=0; j<overflow/4; j++) {
+    for(int j=0; j<overflow/4-1; j++) {
       asm volatile ("p.spsw x0, 0(%[ovf]);"                
                     :
                     :[ovf] "r" (overflow_buffer+j));
@@ -471,7 +471,7 @@ int main (int argc, char **argv) {
   
   base_pointer_offset = 4;
 
-  choice = 1;
+  choice = 12;
 
   switch(choice) {
   case -4:

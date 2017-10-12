@@ -290,6 +290,9 @@ module riscv_core
   logic        is_store_post_tag;
   logic [4:0]  regfile_alu_waddr_fw_tag;
   logic [4:0]  regfile_alu_waddr_tag;
+  logic        store_dest_addr_tag;
+  logic        store_source_tag;
+  logic        use_store_ops;
 `endif
 
   //////////////////////////////////////////////////////////////////////////////////////////////
@@ -591,6 +594,9 @@ module riscv_core
     .pc_ex_o_tag                  (                          ),
     .pc_set_o_tag                 ( pc_set_tag               ),
     .alu_operator_o_mode          ( alu_operator_mode        ),
+    .store_dest_addr_ex_o_tag     ( store_dest_addr_tag      ),
+    .store_source_ex_o_tag        ( store_source_tag         ),
+    .use_store_ops_ex_o           ( use_store_ops            ),
     .alu_operand_a_ex_o_tag       ( alu_operand_a_tag        ),
     .alu_operand_b_ex_o_tag       ( alu_operand_b_tag        ),
     .alu_operand_c_ex_o_tag       ( alu_operand_c_tag        ),
@@ -687,8 +693,11 @@ module riscv_core
     .check_s2_i_tag             ( check_s2_tag                 ),
     .check_d_i_tag              ( check_d_tag                  ),
     .register_set_i_tag         ( register_set_tag             ),
-    .is_store_post_i_tag          ( is_store_post_tag        ),
+    .is_store_post_i_tag        ( is_store_post_tag            ),
     .memory_set_i_tag           ( memory_set_tag               ),
+    .store_dest_addr_i_tag      ( store_dest_addr_tag          ),
+    .store_source_i_tag         ( store_source_tag             ),
+    .use_store_ops_i            ( use_store_ops                ),
     .regfile_alu_waddr_i_tag    ( regfile_alu_waddr_tag        ),
     .regfile_alu_wdata_fw_o_tag ( regfile_alu_wdata_fw_tag     ),
     .regfile_alu_we_fw_o_tag    ( regfile_alu_we_fw_tag        ),

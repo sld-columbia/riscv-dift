@@ -12,9 +12,16 @@ void secretFunction()
 
 void echo()
 {
+  int a;
   register int i asm("x8");
+ 
+  a = i;
 
-  printf("%224u%n%35u%n%253u%n%n", 1, (int*) (i-4), 1, (int*) (i-3), 1, (int*) (i-2), (int*) (i-1));
+  asm volatile ("p.spsw x0, 0(%[a]);"                
+               :
+               :[a] "r" (&a));
+
+  printf("%224u%n%35u%n%253u%n%n", 1, (int*) (a-4), 1, (int*) (a-3), 1, (int*) (a-2), (int*) (a-1));
 
   return;
 }
