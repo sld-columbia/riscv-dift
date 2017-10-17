@@ -73,7 +73,7 @@ vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/pulp_clock_mux2.sv     
 vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/generic_fifo.sv            || goto error
 vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/rstgen.sv                  || goto error
 vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/sp_ram.sv                  || goto error
-vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/sp_ram_tag.sv                  || goto error
+vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/sp_ram_tag.sv              || goto error
 
 # files depending on RISCV vs. OR1K
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/core_region.sv        || goto error

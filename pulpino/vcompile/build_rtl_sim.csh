@@ -29,6 +29,7 @@ echo "${Green}--> Compiling PULPino Platform... ${NC}"
 echo ""
 
 # IP blocks
+# compxlib -s mti_se -f virtex7 -l verilog -o /products/modelsim/xilinx_libs/5_1 || exit 1
 source ${PULP_PATH}/vsim/vcompile/vcompile_ips.csh  || exit 1
 
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_pulpino.sh  || exit 1

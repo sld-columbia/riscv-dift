@@ -47,8 +47,9 @@ module sp_ram_wrap
     .wea    ( be_i & {4{we_i}}       )
   );
 
-  // TODO: we should kill synthesis when the ram size is larger than what we
-  // have here
+`ifdef DIFT
+
+`endif
 
 `elsif ASIC
    // RAM bypass logic

@@ -70,12 +70,12 @@ vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/prefet
 vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/prefetch_L0_buffer.sv || goto error
 vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/tag_propagation_logic.sv || goto error
 vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/tag_check_logic.sv || goto error
-vlog -quiet -sv -work ${LIB_PATH}   +define+DIFT +incdir+${IP_PATH}/include ${IP_PATH}/riscv_core.sv || goto error
+vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/riscv_core.sv || goto error
 
 echo "${Green}Compiling component: ${Brown} riscv_regfile_rtl ${NC}"
 echo "${Red}"
-vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/register_file.sv || goto error
-vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/register_file_tag.sv || goto error
+vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/register_file_ff.sv || goto error
+vlog -quiet -sv -work ${LIB_PATH}   +incdir+${IP_PATH}/include ${IP_PATH}/register_file_ff_tag.sv || goto error
 
 echo "${Green}Compiling component: ${Brown} riscv_vip_rtl ${NC}"
 echo "${Red}"
