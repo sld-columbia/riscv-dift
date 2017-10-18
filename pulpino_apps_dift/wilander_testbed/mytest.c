@@ -471,7 +471,7 @@ int main (int argc, char **argv) {
   
   base_pointer_offset = 4;
 
-  choice = 1;
+  choice = -2;
 
   switch(choice) {
   case -4:
