@@ -28,7 +28,6 @@ module sp_ram_tag
   localparam words = NUM_WORDS/(DATA_WIDTH/8);
 
   logic [DATA_WIDTH/8-1:0] mem[words];
-  logic [DATA_WIDTH/8-1:0] wdata;
   logic [ADDR_WIDTH-1-$clog2(DATA_WIDTH/8):0] addr;
 
   integer i;

@@ -8,12 +8,13 @@ if (! $?PULP_PATH ) then
   setenv PULP_PATH      `pwd`/../
 endif
 
-setenv MSIM_LIBS_PATH ${VSIM_PATH}/modelsim_libs
+setenv MSIM_LIBS_PATH     ${VSIM_PATH}/modelsim_libs
+setenv XILINX_LIBS_PATH   ${VSIM_PATH}/xilinx_libs
 
-setenv IPS_PATH       ${PULP_PATH}/ips
-setenv RTL_PATH       ${PULP_PATH}/rtl
-setenv TB_PATH        ${PULP_PATH}/tb
-setenv FPGA_PATH      ${PULP_PATH}/fpga
+setenv IPS_PATH           ${PULP_PATH}/ips
+setenv RTL_PATH           ${PULP_PATH}/rtl
+setenv TB_PATH            ${PULP_PATH}/tb
+setenv FPGA_PATH          ${PULP_PATH}/fpga
 
 clear
 source ${PULP_PATH}/vsim/vcompile/colors.csh
@@ -29,8 +30,10 @@ echo "${Green}--> Compiling PULPino Platform... ${NC}"
 echo ""
 
 # IP blocks
-# compxlib -s mti_se -f virtex7 -l verilog -o /products/modelsim/xilinx_libs/5_1 || exit 1
-source ${PULP_PATH}/vsim/vcompile/vcompile_ips.csh  || exit 1
+source ${PULP_PATH}/vsim/vcompile/vcompile_ips.csh         || exit 1
+
+vmap unisim ${XILINX_LIBS_PATH}/unisim
+vmap unisims_ver ${XILINX_LIBS_PATH}/unisims_ver
 
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_pulpino.sh  || exit 1
 source ${PULP_PATH}/vsim/vcompile/rtl/vcompile_tb.sh       || exit 1

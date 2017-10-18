@@ -8,7 +8,6 @@ source ${PULP_PATH}/vsim/vcompile/colors.csh
 set IP=pulpino
 set IP_NAME="PULPino"
 
-
 ##############################################################################
 # Check settings
 ##############################################################################
@@ -23,7 +22,6 @@ if (! $?RTL_PATH ) then
   echo "${Red} RTL_PATH is not defined ${NC}"
   exit 1
 endif
-
 
 set LIB_NAME="${IP}_lib"
 set LIB_PATH="${MSIM_LIBS_PATH}/${LIB_NAME}"
@@ -74,17 +72,18 @@ vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/generic_fifo.sv        
 vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/rstgen.sv                  || goto error
 vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/sp_ram.sv                  || goto error
 vlog -quiet -sv -work ${LIB_PATH} ${RTL_PATH}/components/sp_ram_tag.sv              || goto error
+vlog -quiet     -work ${LIB_PATH} ${RTL_PATH}/components/xil_block_ram_8192x4b_1w1r.v              || goto error
+vlog -quiet     -work ${LIB_PATH} ${RTL_PATH}/components/BRAM_8192x2.v              || goto error
+
 
 # files depending on RISCV vs. OR1K
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/core_region.sv        || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/random_stalls.sv      || goto error
-
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/boot_rom_wrap.sv      || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/boot_code.sv          || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/instr_ram_wrap.sv     || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/sp_ram_wrap.sv        || goto error
-# vlog -quiet     -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${FPGA_PATH}/ips/xilinx_mem_8192x32/xilinx_mem_8192x32.srcs/sources_1/ip/xilinx_mem_8192x32/sim/xilinx_mem_8192x32.v || goto error
-# vlog -quiet     -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${FPGA_PATH}/ips/xilinx_mem_8192x32/xilinx_mem_8192x32.srcs/sources_1/ip/xilinx_mem_8192x32/blk_mem_gen_v8_2/simulation/blk_mem_gen_v8_2.v || goto error
+vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/sp_instr_ram_wrap.sv  || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/ram_mux.sv            || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/axi_node_intf_wrap.sv || goto error
 vlog -quiet -sv -work ${LIB_PATH} +incdir+${RTL_PATH}/includes ${ASIC_DEFINES} ${CORE_DEFINES} ${RTL_PATH}/top.sv                || goto error
