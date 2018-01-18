@@ -83,6 +83,11 @@ source cmake_configure.riscv.gcc.sh
 make new_app.vsimc
 ```
 
+Three applications can be used in order to evaluate the correctness of our security scheme:
+* your_path/MS_Thesis/pulpino_apps_dift/QPOP_bftpd/QPOP_bftpd.c
+* your_path/MS_Thesis/pulpino_apps_dift/wilander_testbed/mytest.c
+* your_path/MS_Thesis/pulpino_apps_dift/wu-ftpd/wu-ftpd.c
+
 In order to synthesize the design onto an FPGA board:
 * replace the pulpino/fpga/pulpino/tcl/run.tcl and the  pulpino/fpga/pulpino/tcl/src_files.tcl with the ones stored in MS\_Thesis/pulpino/fpga/pulpino/tcl:
 ```
