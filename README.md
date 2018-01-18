@@ -8,6 +8,7 @@ Install the ri5cy gnu toolchain and add the binaries to the PATH variable:
 ```
 git clone https://github.com/pulp-platform/ri5cy_gnu_toolchain
 cd ri5cy_gnu_toolchain
+cp your_path/MS_Thesis/riscv_tools_delta/riscv_tools_delta.tar.gz .
 make
 PATH=your_path/ri5cy_gnu_toolchain/install/bin:$PATH
 ```
@@ -48,11 +49,17 @@ cd ../../../../vsim
 cp -r your_path/MS_Thesis/pulpino/vsim/* .
 ```
 
+```
+wget http://espdev.cs.columbia.edu/dift-pulpino/xilinx_libs.tar.gz
+tar xfz xilinx_libs.tar.gz
+rm xilinx_libs.tar.gz
+```
+
 Open pulpino/sw/ref/crt0.riscv.S and substitute the "eret" instruction (line 238) with the "mret" instruction.
 
 In order to run a simple "helloworld" application in ModelSim, execute the following commands:
 ```
-cd ../sw
+cd your_path/pulpino/sw
 mkdir build
 cd build
 cp path/MS_Thesis/pulpino/sw/build/cmake_configure.riscv.gcc.sh .
