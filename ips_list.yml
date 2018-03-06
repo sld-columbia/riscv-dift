@@ -1,0 +1,69 @@
+#
+# List of IPs and relative branch/commit-hash/tag.
+# Uses the YAML syntax.
+#
+# Examples:
+#
+#   or10n:
+#     commit: tags/PULP3_final
+#     domain: [cluster]
+#   udma:
+#     commit: 62b10440
+#     domain: [soc]
+#   axi_slice:
+#     commit: master
+#     domain: [soc,cluster]
+# If a *tag* or *commit* is referenced, the IP will be in a
+#  state of DETACHED HEAD. Before committing any additional
+#  work, make sure to checkout a branch.
+#
+
+# APB IPs
+apb/apb_node:
+  commit: 58e26e5ab10a366a1ac301b5bbfc07fe37f7fcc5
+apb/apb_event_unit:
+  commit: af9cf753bd8081ada127b3b2aa4700527d4d26e8
+apb/apb_fll_if:
+  commit: 47b2eb91996fa5572652517a615f307d25f47d59
+apb/apb_gpio:
+  commit: 049532637f6d936140d7178af3656be427713c4e
+apb/apb_i2c:
+  commit: 84855413cc2c8e70209ee7f168a0225d3c5914a1
+apb/apb_pulpino:
+  commit: 5bb6bf07ebb2afb9fe14d047cc06eec1b2173551
+apb/apb_spi_master:
+  commit: e631067b90a99ee794cf83fb43e70b574f172b2d
+apb/apb_timer:
+  commit: e48c4284ca8fb4dc65ad681d1b882f48e5f0582a
+apb/apb_uart:
+  commit: 3bc0006c070b0b9c18719586cab2845cd6e8b63c
+apb/apb2per:
+  commit: 3d674fdae8ac7998892c9cb549d31075c463de84
+
+# AXI IPs
+axi/axi2apb:
+  commit: b4c915fcd9526ab6e7378a3e43555189c898b89a
+axi/axi_mem_if_DP:
+  commit: 7054842d5b888794536339fef07f474b792e84f0
+axi/axi_node:
+  commit: 7987b2da409f9fd293032d4bfee63492cd1929a7
+axi/axi_slice:
+  commit: f31793494e1832a2ed73dad5e6c87575fca0ee7f
+axi/axi_slice_dc:
+  commit: 53e61a33cb6f80ed8fd119e8add9bdd19ed1fcdd
+axi/axi_spi_master:
+  commit: 273d3dc58b5696bfaf475501bf1024cfba1c8a7a
+axi/axi_spi_slave:
+  commit: b15bdd4126610e8ef01f3a3722be791f4dde9d4e
+axi/core2axi:
+  commit: 25eba94af4a58249cfa65e1c259ed4b4c5bbfd12
+
+adv_dbg_if:
+  commit: ec98d1af68677e5bcfc99b93fa575d45dcc4c42c
+
+riscv:
+  commit: f5475852ec3ab6895ef5da78f3ceb70fbacbd091
+  alternatives: [or10n,riscv]
+#or10n:
+#  commit: master
+#  alternatives: [or10n,riscv]
