@@ -1,8 +1,10 @@
 # A Hardware Dynamic Information Flow Tracking Architecture for Low-level Security on a RISC-V Core
 
-These guidelines are part of Christian Palmiero's Master Thesis at Politecnico di Torino (April 2018). Christian integrated DIFT on RI5CY which is a small 4-stage RISC-V core from ETH Zurich and University of Bologna. More details about the original cores are available at
+These guidelines were originally part of Christian Palmiero's Master Thesis at Politecnico di Torino (April 2018). Christian integrated DIFT on RI5CY which is a small 4-stage RISC-V core from ETH Zurich and University of Bologna. More details about the original cores are available at
 * https://github.com/pulp-platform
 * https://www.pulp-platform.org
+
+Recently, Giuseppe Di Guglielmo integrated ESP Loosely-Coupled Accelerator into PULPino (SoC). The following sections describe how to instantiate a LCA as well.
 
 ## PULPino
 
@@ -136,7 +138,7 @@ For example:
 cd $ROOT_DIR/pulpino/sw/apps
 mkdir buffer_overflow
 cd buffer_overflow
-cp $ROOD_DIR/MS_Thesis/pulpino_apps_dift/wilander_testbed/mytest.c buffer_overflow.c
+cp $ROOT_DIR/MS_Thesis/pulpino_apps_dift/wilander_testbed/mytest.c buffer_overflow.c
 echo "add_application(buffer_overflow buffer_overflow.c)" > CMakeLists.txt
 ```
 
@@ -149,7 +151,26 @@ source cmake_configure.riscv.gcc.sh
 make buffer_overflow.vsimc
 ```
 
-### FPGA Deployment
+## LCA-Integration Steps for PULPino (RI5CY)
+
+Replace all the files and folders stored in the `pulpino/rtl` folder with the ones stored in `MS_Thesis/pulpino-lca/rtl`:
+```
+cd $ROOT_DIR/pulpino/rtl
+cp -r $ROOT_DIR/MS_Thesis/pulpino-lca/rtl/* .
+```
+
+In order to add the application running the LCA example, follow this guide:
+* open the `pulpino/sw/apps/CmakeLists.txt` file, go to line 164 and add
+```
+add_subdirectory(alu_accelerator)
+```
+* copy the the application `alu_accelerator` in the folder `pulpino/sw/apps` from `MS_Thesis/pulpino-lca/sw`
+```
+cd $ROOT_DIR/pulpino/sw/apps
+cp -r $ROOT_DIR/MS_Thesis/pulpino-lca/sw/apps/alu_accelerator .
+```
+
+## FPGA Deployment
 
 In order to synthesize the design onto an FPGA board:
 * replace the `pulpino/fpga/pulpino/tcl/run.tcl` and the `pulpino/fpga/pulpino/tcl/src_files.tcl` with the ones stored in `MS_Thesis/pulpino/fpga/pulpino/tcl`:
@@ -171,13 +192,13 @@ This environment variable has to be set during compilation of all FPGA related c
 * devicetree
 * spiloader
 
-#### Requirements
+### Requirements
 
 This synthesis flow has been tested with `Vivado 2015.1` on CentOS 7, there is no guarantee that it is going to work with any other version without modifications to the scripts.
 
 For convenience reasons it is best to connect the ZedBoard to your local network. This way you can easily transfer files from your host computer to the Linux running on the ARM cores of the ZYNQ.
 
-#### Get Started
+### Get Started
 
 1. Make sure you have the Vivado toolchain and the Xilinx SDK toolchain in your PATH before continuing. The Vivado toolchain is required to generate the bitstream, while the SDK contains the ARM compiler that is used for cross-compiling linux and applications. For example:
 ```
@@ -190,18 +211,43 @@ cd $ROOT_DIR/pulpino/fpga
 make
 ```
 
+3. Prepare the SD card and the ZedBoard for booting via SD card. To prepare the card, follow the [Xilinx guide](http://www.wiki.xilinx.com/Prepare+Boot+Medium).
 
-3. Prepare the SD card and the ZedBoard for booting via SD card. To prepare the card, follow the Xilinx guide [1].
+4. Copy the `BOOT.BIN`, `uImage` and `devicetree.dtb` files to the first partition of the SD card. Those files can be found inside the `pulpino/fpga/sw/sd_image` folder.
+```
+sudo mount /dev/sdXX /mnt/sd/boot
+sudo cp $ROOT_DIR/pulpino/fpga/sw/sd_image/BOOT.BIN /mnt/sd/boot
+sudo cp $ROOT_DIR/pulpino/fpga/sw/sd_image/uImage /mnt/sd/boot
+sudo cp $ROOT_DIR/pulpino/fpga/sw/sd_image/devicetree.dtb /mnt/sd/boot
+sudo umount /mnt/sd/boot
+```
 
-4. Copy the BOOT.BIN, uImage and devicetree.dtb files to the first partition of the SD card. Those files can be found inside the `fpga/sw/sd_image` folder.
+5. Extract the content of the `pulpino/fpga/sw/sd_image/rootfs.tar` archive and put it on the second partition of the SD card. You are ready now:
+```
+sudo mount /dev/sdXY /mnt/sd/root
+sudo sudo tar xvf $ROOT_DIR/pulpino/fpga/sw/sd_image/rootfs.tar -C /mnt/sd/root
+sudo umount /mnt/sd/root
+```
 
-5. Extract the content of the rootfs.tar archive and put it on the second partition of the SD card. You are ready now
+6. Configure the Zedboard jumpers to boot from SD card:
+```
+JP6 shorted
+
+JP7  [MODE0] - GND
+JP8  [MODE1] - GND
+JP9  [MODE2] - 3V3
+JP10 [MODE3] - 3V3
+JP11 [MODE4] - GND
+```
 
 6. Put the SD card into the ZedBoard and boot the system. You can use minicom or any other terminal emulator tool to communicate with the UART of the ZedBoard.
+```
+zynq-boot> boot
+```
 
 7. You should now be able to login to the ZYNQ and have a fully working Linux running on it.
 
-8. To be able to login to Linux via ssh, you have to make sure that Linux is able to access the local network. By default it will try to get an IP address via dhcp. You can check with `ifconfig` and friends if your device has gotten an IP address and use it to connect to it via a host.
+8. To be able to login to Linux via ssh, you have to make sure that Linux is able to access the local network. By default it will try to get an IP address via DHCP. You can check with `ifconfig` and friends if your device has gotten an IP address and use it to connect to it via a host.
 
 9. In order to login use the following credentials:
 ```
@@ -212,13 +258,17 @@ password: pulp
 The `boot.bin` and `rootfs.tar` files can be found under the folder `sw/sd_image`.
 
 
-#### Running applications on PULPino
+### Running applications on PULPino
 
-1. Make sure you have a fully working Linux running on the ZYNQ. Otherwise see section "get started" above.
+1. Make sure you have a fully working Linux running on the ZYNQ.
 
 2. Currently the only method to load a program into the PULPino system is via SPI. Linux uses its SPI master to communicate with PULPino's SPI slave and writes directly into the instruction and data memory of PULPino. The spiload program which can be found under sw/apps/spiload takes care of this.
 
-3. Compile the spiload application for the ZYNQ. Just type `make` inside the sw/apps/spiload folder.
+3. Compile the spiload application for the ZYNQ. Just type `make` inside the `pulpino/fpga/sw/apps/spiload` folder.
+```
+cd $ROOT_DIR/pulpino/fpga/sw/apps/spiload
+make
+```
 
 4. Transfer this program to the ZYNQ. We suggest using scp, but any other method works as well of course.
 
@@ -240,15 +290,11 @@ make applicationName.fpga
 
 You need to be able to ssh into the Linux running on the ZYNQ fpga (e.g. using public keys) and you need to setup the environment variable `$FPGA_HOSTNAME`. Take a look at the script `./sw/utils/run-on-fpga.sh` to understand how it works.
 
-#### stdout via printf on PULPino
+### stdout via printf on PULPino
 
-When PULPino is run on the FPGA, it transfers all output via printf via UART to
-the ARM host processor in the ZYNQ. To display it, either use a console program
-like minicom to read directly from the serial port, or specify a timeout when
-using `spiload`. `spiload` will connect to the serial port and display
-everything that PULPino sends via UART until the timeout expires.
+When PULPino is run on the FPGA, it transfers all output via printf via UART to the ARM host processor in the ZYNQ. To display it, either use a console program like minicom to read directly from the serial port, or specify a timeout when using `spiload`. `spiload` will connect to the serial port and display everything that PULPino sends via UART until the timeout expires.
 
-#### Connected peripherals & communication with PULPino
+### Connected peripherals & communication with PULPino
 
 PULPino includes a set of built-in peripherals like SPI, UART and GPIOs. The SPI slave peripheral is connected to the SPI master of the ZYNQ, thus it is possible to directly write to any memory address of PULPino from outside.
 
@@ -283,6 +329,3 @@ PULPino GPIO pin 18: BTNL
 PULPino GPIO pin 19: BTNR
 PULPino GPIO pin 20: BTNU
 ```
-
-[1] http://www.wiki.xilinx.com/Prepare+Boot+Medium
-

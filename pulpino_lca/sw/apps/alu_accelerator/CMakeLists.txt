@@ -1,0 +1,1 @@
+add_application(alu_accelerator alu_accelerator.c)
