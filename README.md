@@ -24,7 +24,7 @@ PULPino has the following requirements:
 
 This `README.md` is part of the [repository](git@dev.sld.cs.columbia.edu:riscv-dift.git) and should sit in the `MS_Thesis` directory. If it is not, please clone the repository first:
 ```
-git clone git@dev.sld.cs.columbia.edu:riscv-dift.git MS_Thesis
+git clone git@github.com:sld-columbia/riscv-dift.git MS_Thesis
 cd MS_Thesis
 ```
 
